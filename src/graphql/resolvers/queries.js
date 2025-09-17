@@ -1,6 +1,8 @@
-import { prisma } from '../../prisma/client.js';
+import prisma from '../../../prisma/client.js';
 import { logger } from '../../config/index.js';
 import { ForbiddenError, NotFoundError } from '../../utils/errors.js';
+
+import { apiResponse } from '../../utils/response.js';
 
 /**
  * GraphQL Query Resolvers
@@ -9,7 +11,11 @@ const queries = {
     // Hello world query for testing
     hello: () => {
         logger.debug('GraphQL hello query executed');
-        return 'Hello from Apollo Server!';
+        return apiResponse({
+            status: true,
+            message: 'Hello from Apollo Server!',
+            data: null,
+        });
     },
 
     // Get authenticated user's profile
@@ -17,11 +23,14 @@ const queries = {
         if (!user) {
             throw new ForbiddenError('Authentication required');
         }
-
         logger.debug(`GraphQL me query executed for user: ${user.id}`);
         return prisma.user.findUnique({
             where: { id: user.id }
-        });
+        }).then(userData => apiResponse({
+            status: true,
+            message: 'User profile fetched successfully',
+            data: userData,
+        }));
     },
 
     // Get user by ID
@@ -30,18 +39,18 @@ const queries = {
         if (!user || (user.id !== id && user.role !== 'ADMIN')) {
             throw new ForbiddenError('Not authorized to access this user');
         }
-
         logger.debug(`GraphQL user query executed for user: ${id}`);
-
         const userData = await prisma.user.findUnique({
             where: { id }
         });
-
         if (!userData) {
             throw new NotFoundError('User not found');
         }
-
-        return userData;
+        return apiResponse({
+            status: true,
+            message: 'User fetched successfully',
+            data: userData,
+        });
     },
 
     // Get all users (admin only)
@@ -49,10 +58,13 @@ const queries = {
         if (!user || user.role !== 'ADMIN') {
             throw new ForbiddenError('Admin access required');
         }
-
         logger.debug('GraphQL users query executed');
-
-        return prisma.user.findMany();
+        const users = await prisma.user.findMany();
+        return apiResponse({
+            status: true,
+            message: 'All users fetched successfully',
+            data: users,
+        });
     }
 };
 

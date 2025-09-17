@@ -10,8 +10,8 @@ const router = express.Router();
  */
 
 // Protect all analytics routes - require admin role
-router.use(authMiddleware);
-router.use(roleMiddleware('ADMIN'));
+// router.use(authMiddleware);
+// router.use(roleMiddleware('ADMIN'));
 
 // Get server metrics
 router.get('/metrics', AnalyticsController.getMetrics);

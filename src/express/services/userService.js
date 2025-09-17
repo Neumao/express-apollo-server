@@ -1,8 +1,8 @@
 import bcrypt from 'bcrypt';
-import { prisma } from '../../prisma/client.js';
 import { logger } from '../../config/logger.js';
 import { ValidationError, NotFoundError, ConflictError } from '../../utils/errors.js';
 import { generateAccessToken, generateRefreshToken } from '../../utils/jwtUtils.js';
+import prisma from '../../../prisma/client.js';
 
 /**
  * Service for user-related operations
@@ -60,6 +60,11 @@ export class UserService {
      * @returns {Object} Authentication data with tokens and user info
      */
     static async login(email, password) {
+        if (!email || !password) {
+            logger.error('Login attempt with missing email or password');
+            throw new ValidationError('Email and password are required');
+        }
+
         // Find user
         const user = await prisma.user.findUnique({
             where: { email },
@@ -67,6 +72,11 @@ export class UserService {
 
         if (!user) {
             logger.warn(`Login attempt with non-existent email: ${email}`);
+            throw new ValidationError('Invalid email or password');
+        }
+
+        if (!user.password) {
+            logger.error(`User record for ${email} is missing a password`);
             throw new ValidationError('Invalid email or password');
         }
 

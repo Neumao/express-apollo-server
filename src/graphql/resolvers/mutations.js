@@ -1,9 +1,11 @@
 import bcrypt from 'bcrypt';
-import { prisma } from '../../prisma/client.js';
 import { logger } from '../../config/logger.js';
 import { generateAccessToken, generateRefreshToken } from '../../utils/jwtUtils.js';
 import { ValidationError, ForbiddenError, NotFoundError, ConflictError } from '../../utils/errors.js';
 import { publish, TOPICS } from '../pubsub/index.js';
+
+import { apiResponse } from '../../utils/response.js';
+import prisma from '../../../prisma/client.js';
 
 /**
  * GraphQL Mutation Resolvers
@@ -46,10 +48,11 @@ const mutations = {
             // Publish user created event
             publish(TOPICS.USER_CREATED, { userCreated: { user } });
 
-            return {
+            return apiResponse({
+                status: true,
                 message: 'User registered successfully',
-                user,
-            };
+                data: user,
+            });
         } catch (error) {
             logger.error(`Error creating user via GraphQL: ${error.message}`);
             throw error;
@@ -61,19 +64,17 @@ const mutations = {
      */
     login: async (_, { input }) => {
         const { email, password } = input;
-
         // Find user
         const user = await prisma.user.findUnique({
             where: { email },
         });
-
         if (!user) {
             logger.warn(`Login attempt with non-existent email: ${email}`);
             throw new ValidationError('Invalid email or password');
         }
 
         // Verify password
-        const passwordValid = await bcrypt.compare(password, user.password);
+        const passwordValid = await bcrypt.compare(password, user.passwordHash);
         if (!passwordValid) {
             logger.warn(`Failed login attempt for user: ${user.id}`);
             throw new ValidationError('Invalid email or password');
@@ -88,17 +89,19 @@ const mutations = {
             where: { id: user.id },
             data: {
                 refreshToken,
-                lastLogin: new Date(),
+                lastLoginAt: new Date(),
             },
         });
-
         logger.info(`User logged in via GraphQL: ${user.id}`);
-
-        return {
-            accessToken,
-            refreshToken,
-            user,
-        };
+        return apiResponse({
+            status: true,
+            message: 'Login successful',
+            data: {
+                accessToken,
+                refreshToken,
+                user,
+            },
+        });
     },
 
     /**
@@ -120,10 +123,14 @@ const mutations = {
 
         logger.info(`Access token refreshed via GraphQL for user: ${user.id}`);
 
-        return {
-            accessToken,
-            user,
-        };
+        return apiResponse({
+            status: true,
+            message: 'Access token refreshed',
+            data: {
+                accessToken,
+                user,
+            },
+        });
     },
 
     /**
@@ -144,7 +151,11 @@ const mutations = {
 
         logger.info(`User logged out via GraphQL: ${user.id}`);
 
-        return { message: 'Logout successful' };
+        return apiResponse({
+            status: true,
+            message: 'Logout successful',
+            data: null,
+        });
     },
 
     /**
@@ -196,10 +207,11 @@ const mutations = {
             // Publish user updated event
             publish(TOPICS.USER_UPDATED, { userUpdated: { user: updatedUser } });
 
-            return {
+            return apiResponse({
+                status: true,
                 message: 'User updated successfully',
-                user: updatedUser,
-            };
+                data: updatedUser,
+            });
         } catch (error) {
             if (error.code === 'P2025') {
                 throw new NotFoundError('User not found');
@@ -232,7 +244,11 @@ const mutations = {
             // Publish user deleted event
             publish(TOPICS.USER_DELETED, { userDeleted: { userId: id } });
 
-            return { message: 'User deleted successfully' };
+            return apiResponse({
+                status: true,
+                message: 'User deleted successfully',
+                data: null,
+            });
         } catch (error) {
             if (error.code === 'P2025') {
                 throw new NotFoundError('User not found');

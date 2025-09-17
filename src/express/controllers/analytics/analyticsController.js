@@ -1,177 +1,190 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { prisma } from '../../../prisma/client.js';
 import { logger } from '../../../config/logger.js';
+import { apiResponse } from '../../../utils/response.js';
+import prisma from '../../../../prisma/client.js';
 
 /**
  * Controller for analytics dashboard
  */
 export class AnalyticsController {
-    /**
-     * Get server metrics for dashboard
-     * @param {Object} req - Express request object
-     * @param {Object} res - Express response object
-     * @param {Function} next - Express next middleware function
-     */
-    static async getMetrics(req, res, next) {
-        try {
-            const metrics = {
-                users: {
-                    total: await prisma.user.count(),
-                    active: await prisma.user.count({
-                        where: {
-                            lastLogin: {
-                                gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
-                            },
-                        },
-                    }),
-                    newToday: await prisma.user.count({
-                        where: {
-                            createdAt: {
-                                gte: new Date(new Date().setHours(0, 0, 0, 0)),
-                            },
-                        },
-                    }),
-                },
-                server: {
-                    uptime: process.uptime(),
-                    memory: process.memoryUsage(),
-                    nodeVersion: process.version,
-                },
+  /**
+   * Get server metrics for dashboard
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @param {Function} next - Express next middleware function
+   */
+  static async getMetrics(req, res, next) {
+    try {
+      const metrics = {
+        users: {
+          total: await prisma.user.count(),
+          active: await prisma.user.count({
+            where: {
+              lastLogin: {
+                gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
+              },
+            },
+          }),
+          newToday: await prisma.user.count({
+            where: {
+              createdAt: {
+                gte: new Date(new Date().setHours(0, 0, 0, 0)),
+              },
+            },
+          }),
+        },
+        server: {
+          uptime: process.uptime(),
+          memory: process.memoryUsage(),
+          nodeVersion: process.version,
+        },
+      };
+
+      res.json(apiResponse({
+        status: true,
+        message: 'Server metrics fetched successfully',
+        data: metrics,
+      }));
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Get recent logs
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @param {Function} next - Express next middleware function
+   */
+  static async getLogs(req, res, next) {
+    try {
+      const logDir = path.join(process.cwd(), 'logs');
+      const limit = parseInt(req.query.limit || '100', 10);
+      const level = req.query.level || null;
+
+      // Get log files
+      const files = await fs.readdir(logDir);
+      const latestLogFile = files
+        .filter(file => file.startsWith('application-') && file.endsWith('.log'))
+        .sort()
+        .reverse()[0];
+
+      if (!latestLogFile) {
+        return res.json(apiResponse({
+          status: true,
+          message: 'No log files found',
+          data: [],
+        }));
+      }
+
+      // Read log file
+      const logFilePath = path.join(logDir, latestLogFile);
+      const content = await fs.readFile(logFilePath, 'utf8');
+
+      // Parse logs
+      const logs = content
+        .split('\n')
+        .filter(line => line.trim())
+        .map(line => {
+          try {
+            const parts = line.split(' ');
+            const timestamp = parts.slice(0, 2).join(' ');
+            const levelWithColon = parts[2];
+            const levelText = levelWithColon.substring(0, levelWithColon.length - 1);
+            const message = parts.slice(3).join(' ');
+
+            return {
+              timestamp,
+              level: levelText,
+              message,
             };
-
-            res.json({ metrics });
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    /**
-     * Get recent logs
-     * @param {Object} req - Express request object
-     * @param {Object} res - Express response object
-     * @param {Function} next - Express next middleware function
-     */
-    static async getLogs(req, res, next) {
-        try {
-            const logDir = path.join(process.cwd(), 'logs');
-            const limit = parseInt(req.query.limit || '100', 10);
-            const level = req.query.level || null;
-
-            // Get log files
-            const files = await fs.readdir(logDir);
-            const latestLogFile = files
-                .filter(file => file.startsWith('application-') && file.endsWith('.log'))
-                .sort()
-                .reverse()[0];
-
-            if (!latestLogFile) {
-                return res.json({ logs: [] });
-            }
-
-            // Read log file
-            const logFilePath = path.join(logDir, latestLogFile);
-            const content = await fs.readFile(logFilePath, 'utf8');
-
-            // Parse logs
-            const logs = content
-                .split('\n')
-                .filter(line => line.trim())
-                .map(line => {
-                    try {
-                        const parts = line.split(' ');
-                        const timestamp = parts.slice(0, 2).join(' ');
-                        const levelWithColon = parts[2];
-                        const levelText = levelWithColon.substring(0, levelWithColon.length - 1);
-                        const message = parts.slice(3).join(' ');
-
-                        return {
-                            timestamp,
-                            level: levelText,
-                            message,
-                        };
-                    } catch (err) {
-                        return {
-                            timestamp: 'unknown',
-                            level: 'unknown',
-                            message: line,
-                        };
-                    }
-                })
-                .filter(log => !level || log.level === level)
-                .slice(-limit);
-
-            res.json({ logs });
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    /**
-     * Get API usage statistics
-     * @param {Object} req - Express request object
-     * @param {Object} res - Express response object
-     * @param {Function} next - Express next middleware function
-     */
-    static async getApiUsage(req, res, next) {
-        try {
-            // For a real implementation, you would use a database or other storage
-            // to track API usage. This is just a simple example.
-
-            // In a production app, you might use Redis, a DB table, or
-            // a time-series database to track API usage
-
-            // For now, return mock data
-            const usage = {
-                endpoints: [
-                    { path: '/api/users', calls: 120, avgResponseTime: 45 },
-                    { path: '/api/auth/login', calls: 85, avgResponseTime: 120 },
-                    { path: '/api/auth/refresh-token', calls: 230, avgResponseTime: 30 },
-                    { path: '/graphql', calls: 340, avgResponseTime: 75 },
-                ],
-                timeFrames: [
-                    { time: '00:00', calls: 12 },
-                    { time: '01:00', calls: 5 },
-                    { time: '02:00', calls: 3 },
-                    { time: '03:00', calls: 2 },
-                    { time: '04:00', calls: 1 },
-                    { time: '05:00', calls: 2 },
-                    { time: '06:00', calls: 8 },
-                    { time: '07:00', calls: 15 },
-                    { time: '08:00', calls: 32 },
-                    { time: '09:00', calls: 47 },
-                    { time: '10:00', calls: 55 },
-                    { time: '11:00', calls: 48 },
-                    { time: '12:00', calls: 52 },
-                    { time: '13:00', calls: 46 },
-                    { time: '14:00', calls: 42 },
-                    { time: '15:00', calls: 45 },
-                    { time: '16:00', calls: 40 },
-                    { time: '17:00', calls: 38 },
-                    { time: '18:00', calls: 30 },
-                    { time: '19:00', calls: 25 },
-                    { time: '20:00', calls: 20 },
-                    { time: '21:00', calls: 15 },
-                    { time: '22:00', calls: 10 },
-                    { time: '23:00', calls: 8 },
-                ],
+          } catch (err) {
+            return {
+              timestamp: 'unknown',
+              level: 'unknown',
+              message: line,
             };
+          }
+        })
+        .filter(log => !level || log.level === level)
+        .slice(-limit);
 
-            res.json({ usage });
-        } catch (error) {
-            next(error);
-        }
+      res.json(apiResponse({
+        status: true,
+        message: 'Logs fetched successfully',
+        data: logs,
+      }));
+    } catch (error) {
+      next(error);
     }
+  }
 
-    /**
-     * Render HTML dashboard
-     * @param {Object} req - Express request object
-     * @param {Object} res - Express response object
-     * @param {Function} next - Express next middleware function
-     */
-    static async renderDashboard(req, res, next) {
-        try {
-            const html = `
+  /**
+   * Get API usage statistics
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @param {Function} next - Express next middleware function
+   */
+  static async getApiUsage(req, res, next) {
+    try {
+      // For a real implementation, you would use a database or other storage
+      // to track API usage. This is just a simple example.
+
+      // In a production app, you might use Redis, a DB table, or
+      // a time-series database to track API usage
+
+      // For now, return mock data
+      const usage = {
+        endpoints: [
+          { path: '/api/users', calls: 120, avgResponseTime: 45 },
+          { path: '/api/auth/login', calls: 85, avgResponseTime: 120 },
+          { path: '/api/auth/refresh-token', calls: 230, avgResponseTime: 30 },
+          { path: '/graphql', calls: 340, avgResponseTime: 75 },
+        ],
+        timeFrames: [
+          { time: '00:00', calls: 12 },
+          { time: '01:00', calls: 5 },
+          { time: '02:00', calls: 3 },
+          { time: '03:00', calls: 2 },
+          { time: '04:00', calls: 1 },
+          { time: '05:00', calls: 2 },
+          { time: '06:00', calls: 8 },
+          { time: '07:00', calls: 15 },
+          { time: '08:00', calls: 32 },
+          { time: '09:00', calls: 47 },
+          { time: '10:00', calls: 55 },
+          { time: '11:00', calls: 48 },
+          { time: '12:00', calls: 52 },
+          { time: '13:00', calls: 46 },
+          { time: '14:00', calls: 42 },
+          { time: '15:00', calls: 45 },
+          { time: '16:00', calls: 40 },
+          { time: '17:00', calls: 38 },
+          { time: '18:00', calls: 30 },
+          { time: '19:00', calls: 25 },
+          { time: '20:00', calls: 20 },
+          { time: '21:00', calls: 15 },
+          { time: '22:00', calls: 10 },
+          { time: '23:00', calls: 8 },
+        ],
+      };
+
+      res.json({ usage });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Render HTML dashboard
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @param {Function} next - Express next middleware function
+   */
+  static async renderDashboard(req, res, next) {
+    try {
+      const html = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -480,10 +493,10 @@ export class AnalyticsController {
 </html>
       `;
 
-            res.setHeader('Content-Type', 'text/html');
-            res.send(html);
-        } catch (error) {
-            next(error);
-        }
+      res.setHeader('Content-Type', 'text/html');
+      res.send(html);
+    } catch (error) {
+      next(error);
     }
+  }
 }

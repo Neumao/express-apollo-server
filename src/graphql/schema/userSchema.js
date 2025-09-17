@@ -2,6 +2,7 @@ const userSchema = `#graphql
   enum UserRole {
     USER
     ADMIN
+    MODERATOR
   }
 
   type User {
@@ -36,23 +37,16 @@ const userSchema = `#graphql
 
   type AuthPayload {
     accessToken: String!
-    refreshToken: String!
     user: User!
   }
 
-  type RefreshTokenPayload {
-    accessToken: String!
-    user: User!
+  type ResponsePayload {
+    status: Boolean!
+    message: String!
+    data: JSON
   }
 
-  type UserMutationResponse {
-    message: String!
-    user: User
-  }
-
-  type MessageResponse {
-    message: String!
-  }
+  scalar JSON
 
   type UserCreatedPayload {
     user: User!
@@ -63,25 +57,37 @@ const userSchema = `#graphql
   }
 
   type UserDeletedPayload {
+    user: User!
+  }
+    user: User!
+  }
+
+  type UserDeletedPayload {
     userId: ID!
   }
 
-  extend type Query {
-    me: User
-    user(id: ID!): User
-    users: [User!]!
+  # Placeholder field for empty types
+  type Query {
+    _: Boolean
+    me: ResponsePayload
+    user(id: ID!): ResponsePayload
+    users: ResponsePayload
   }
 
-  extend type Mutation {
-    register(input: RegisterInput!): UserMutationResponse!
-    login(input: LoginInput!): AuthPayload!
-    refreshToken(token: String!): RefreshTokenPayload!
-    logout: MessageResponse!
-    updateUser(id: ID!, input: UpdateUserInput!): UserMutationResponse!
-    deleteUser(id: ID!): MessageResponse!
+  # Placeholder field for empty types
+  type Mutation {
+    _: Boolean
+    register(input: RegisterInput!): ResponsePayload!
+    login(input: LoginInput!): ResponsePayload!
+    refreshToken(token: String!): ResponsePayload!
+    logout: ResponsePayload!
+    updateUser(id: ID!, input: UpdateUserInput!): ResponsePayload!
+    deleteUser(id: ID!): ResponsePayload!
   }
 
-  extend type Subscription {
+  # Placeholder field for empty types
+  type Subscription {
+    _: Boolean
     userCreated: UserCreatedPayload!
     userUpdated(id: ID!): UserUpdatedPayload!
     userDeleted: UserDeletedPayload!

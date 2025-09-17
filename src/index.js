@@ -8,6 +8,7 @@ import { logger, config } from './config/index.js';
 import path from 'path';
 import fs from 'fs';
 import { WebSocketServer } from 'ws';
+import appSeeding from './seeding/appSeeding.js';
 
 process.on('uncaughtException', (err) => {
     logger.error('UNCAUGHT EXCEPTION:', err);
@@ -85,8 +86,10 @@ async function startServer() {
 }
 
 await startServer()
-    .then(() => {
+    .then(async () => {
         logger.info('Server started successfully');
+        await appSeeding.systemUser(); // Corrected to call the static method directly
+
     })
     .catch(error => {
         logger.error('Failed to start server:', error);

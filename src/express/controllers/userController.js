@@ -1,7 +1,8 @@
 import { UserService } from '../services/userService.js';
 import { logger } from '../../config/logger.js';
 import { ForbiddenError } from '../../utils/errors.js';
-import { prisma } from '../../prisma/client.js';
+import { apiResponse } from '../../utils/response.js';
+import prisma from '../../../prisma/client.js';
 
 /**
  * Controller for user endpoints
@@ -23,8 +24,11 @@ export class UserController {
             }
 
             const user = await UserService.getUserById(id);
-
-            res.json({ user });
+            res.json(apiResponse({
+                status: true,
+                message: 'User profile fetched successfully',
+                data: user,
+            }));
         } catch (error) {
             next(error);
         }
@@ -46,11 +50,11 @@ export class UserController {
             }
 
             const updatedUser = await UserService.updateUser(id, req.body);
-
-            res.json({
+            res.json(apiResponse({
+                status: true,
                 message: 'Profile updated successfully',
-                user: updatedUser,
-            });
+                data: updatedUser,
+            }));
         } catch (error) {
             next(error);
         }
@@ -72,8 +76,11 @@ export class UserController {
             }
 
             const result = await UserService.deleteUser(id);
-
-            res.json(result);
+            res.json(apiResponse({
+                status: true,
+                message: 'User deleted successfully',
+                data: result,
+            }));
         } catch (error) {
             next(error);
         }
@@ -99,8 +106,11 @@ export class UserController {
                     lastLogin: true,
                 },
             });
-
-            res.json({ users });
+            res.json(apiResponse({
+                status: true,
+                message: 'All users fetched successfully',
+                data: users,
+            }));
         } catch (error) {
             next(error);
         }

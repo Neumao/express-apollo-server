@@ -28,11 +28,71 @@ const dateTimeScalar = new GraphQLScalarType({
     },
 });
 
+// JSON scalar type for flexible data structures
+const jsonScalar = new GraphQLScalarType({
+    name: 'JSON',
+    description: 'JSON custom scalar type',
+
+    serialize(value) {
+        return value;
+    },
+
+    parseValue(value) {
+        return value;
+    },
+
+    parseLiteral(ast) {
+        switch (ast.kind) {
+            case Kind.STRING:
+            case Kind.BOOLEAN:
+                return ast.value;
+            case Kind.INT:
+            case Kind.FLOAT:
+                return Number(ast.value);
+            case Kind.OBJECT:
+                return parseObject(ast);
+            case Kind.LIST:
+                return ast.values.map(n => parseLiteral(n));
+            case Kind.NULL:
+                return null;
+            default:
+                return null;
+        }
+    },
+});
+
+// Helper function for JSON scalar
+function parseObject(ast) {
+    const value = Object.create(null);
+    ast.fields.forEach(field => {
+        value[field.name.value] = parseLiteral(field.value);
+    });
+    return value;
+}
+
+function parseLiteral(ast) {
+    switch (ast.kind) {
+        case Kind.STRING:
+        case Kind.BOOLEAN:
+            return ast.value;
+        case Kind.INT:
+        case Kind.FLOAT:
+            return Number(ast.value);
+        case Kind.OBJECT:
+            return parseObject(ast);
+        case Kind.LIST:
+            return ast.values.map(n => parseLiteral(n));
+        case Kind.NULL:
+            return null;
+        default:
+            return null;
+    }
+}
+
 // Type resolvers
 const typeResolvers = {
     DateTime: dateTimeScalar,
-
-    // Add any other custom type resolvers here
+    JSON: jsonScalar,
 };
 
 export default typeResolvers;

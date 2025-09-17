@@ -8,10 +8,12 @@ const baseSchema = `#graphql
 
   type Mutation {
     _: Boolean
+    # Root mutation type - extended by other schemas
   }
 
   type Subscription {
     _: Boolean
+    # Root subscription type - extended by other schemas
   }
 `;
 

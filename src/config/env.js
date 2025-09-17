@@ -2,7 +2,10 @@
  * Environment configuration
  * Centralizes all environment variable access and provides defaults
  */
+import dotenv from 'dotenv';
 
+// Load environment variables from .env file
+dotenv.config();
 const config = {
     // Server configuration
     port: process.env.PORT || 4000,
@@ -44,6 +47,13 @@ const config = {
         windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '15', 10) * 60 * 1000, // default 15 minutes
         max: parseInt(process.env.RATE_LIMIT_MAX || '100', 10), // default 100 requests per windowMs
     },
+
+    // System User
+    systemUser: {
+        email: process.env.SYSTEM_ADMIN_EMAIL,
+        password: process.env.SYSTEM_ADMIN_PASSWORD,
+        userName: process.env.SYSTEM_ADMIN_USERNAME
+    }
 };
 
 export default config;
