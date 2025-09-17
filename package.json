@@ -1,0 +1,44 @@
+{
+  "name": "express-apollo-server",
+  "version": "1.0.0",
+  "description": "Node.js backend with Express REST API and Apollo GraphQL server",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "test": "jest",
+    "lint": "eslint src/**/*.js"
+  },
+  "dependencies": {
+    "@apollo/server": "^5.0.0",
+    "@as-integrations/express5": "^1.1.2",
+    "@prisma/client": "^6.16.2",
+    "bcrypt": "^6.0.0",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "graphql": "^16.11.0",
+    "graphql-subscriptions": "^3.0.0",
+    "graphql-ws": "^6.0.6",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.1",
+    "nodemailer": "^7.0.6",
+    "prisma": "^6.16.2",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.10",
+    "supertest": "^6.3.4"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

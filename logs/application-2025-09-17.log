@@ -1,0 +1,456 @@
+2025-09-17 13:41:54:4154 info: Starting server...
+2025-09-17 13:41:56:4156 info: Apollo Server started
+2025-09-17 13:41:56:4156 info: Server running in development mode
+2025-09-17 13:41:56:4156 info: Express REST API running at http://localhost:4000/api
+2025-09-17 13:41:56:4156 info: Apollo GraphQL running at http://localhost:4000/graphql
+2025-09-17 13:41:56:4156 info: GraphQL subscriptions running at ws://localhost:4000/graphql
+2025-09-17 13:42:05:425 info: Starting server...
+2025-09-17 13:42:06:426 info: Apollo Server started
+2025-09-17 13:42:06:426 info: Server running in development mode
+2025-09-17 13:42:06:426 info: Express REST API running at http://localhost:4000/api
+2025-09-17 13:42:06:426 info: Apollo GraphQL running at http://localhost:4000/graphql
+2025-09-17 13:42:06:426 info: GraphQL subscriptions running at ws://localhost:4000/graphql
+2025-09-17 13:42:09:429 http: GET /graphql 404 4.918 ms - {}
+2025-09-17 13:43:21:4321 info: Starting server...
+2025-09-17 13:43:21:4321 info: Apollo Server started
+2025-09-17 13:43:21:4321 info: Server running in development mode
+2025-09-17 13:43:21:4321 info: Express REST API running at http://localhost:4000/api
+2025-09-17 13:43:21:4321 info: Apollo GraphQL running at http://localhost:4000/graphql
+2025-09-17 13:43:21:4321 info: GraphQL subscriptions running at ws://localhost:4000/graphql
+2025-09-17 13:43:33:4333 http: GET /graphql 404 4.516 ms - {}
+2025-09-17 13:43:35:4335 http: GET /graphql 404 0.895 ms - {}
+2025-09-17 13:43:48:4348 info: Starting server...
+2025-09-17 13:43:48:4348 info: Apollo Server started
+2025-09-17 13:43:48:4348 info: Server running in development mode
+2025-09-17 13:43:48:4348 info: Express REST API running at http://localhost:4000/api
+2025-09-17 13:43:48:4348 info: Apollo GraphQL running at http://localhost:4000/graphql
+2025-09-17 13:43:48:4348 info: GraphQL subscriptions running at ws://localhost:4000/graphql
+2025-09-17 13:43:52:4352 http: GET /graphql 404 8.700 ms - {}
+2025-09-17 13:44:11:4411 info: Starting server...
+2025-09-17 13:44:11:4411 info: Apollo Server started
+2025-09-17 13:44:11:4411 info: Server running in development mode
+2025-09-17 13:44:11:4411 info: Express REST API running at http://localhost:4000/api
+2025-09-17 13:44:11:4411 info: Apollo GraphQL running at http://localhost:4000/graphql
+2025-09-17 13:44:11:4411 info: GraphQL subscriptions running at ws://localhost:4000/graphql
+2025-09-17 13:44:54:4454 info: Starting server...
+2025-09-17 13:44:54:4454 info: Apollo Server started
+2025-09-17 13:44:54:4454 info: Server running in development mode
+2025-09-17 13:44:54:4454 info: Express REST API running at http://localhost:4000/api
+2025-09-17 13:44:54:4454 info: Apollo GraphQL running at http://localhost:4000/graphql
+2025-09-17 13:44:54:4454 info: GraphQL subscriptions running at ws://localhost:4000/graphql
+2025-09-17 13:45:00:450 http: GET /graphql 200 36.150 ms - {}
+2025-09-17 13:45:00:450 http: GET /favicon.ico 404 2.069 ms - {}
+2025-09-17 13:45:09:459 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 13:45:09:459 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 13:45:09:459 http: POST /graphql 200 75.255 ms - {"query":"\n    query IntrospectionQuery {\n      __schema {\n        \n        queryType { name }\n        mutationType { name }\n        subscriptionType { name }\n        types {\n          ...FullType\n        }\n        directives {\n          name\n          description\n          \n          locations\n          args {\n            ...InputValue\n          }\n        }\n      }\n    }\n\n    fragment FullType on __Type {\n      kind\n      name\n      description\n      \n      fields(includeDeprecated: true) {\n        name\n        description\n        args {\n          ...InputValue\n        }\n        type {\n          ...TypeRef\n        }\n        isDeprecated\n        deprecationReason\n      }\n      inputFields {\n        ...InputValue\n      }\n      interfaces {\n        ...TypeRef\n      }\n      enumValues(includeDeprecated: true) {\n        name\n        description\n        isDeprecated\n        deprecationReason\n      }\n      possibleTypes {\n        ...TypeRef\n      }\n    }\n\n    fragment InputValue on __InputValue {\n      name\n      description\n      type { ...TypeRef }\n      defaultValue\n      \n      \n    }\n\n    fragment TypeRef on __Type {\n      kind\n      name\n      ofType {\n        kind\n        name\n        ofType {\n          kind\n          name\n          ofType {\n            kind\n            name\n            ofType {\n              kind\n              name\n              ofType {\n                kind\n                name\n                ofType {\n                  kind\n                  name\n                  ofType {\n                    kind\n                    name\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  ","operationName":"IntrospectionQuery"}
+2025-09-17 13:45:11:4511 info: Starting server...
+2025-09-17 13:45:12:4512 info: Apollo Server started
+2025-09-17 13:45:12:4512 info: Server running in development mode
+2025-09-17 13:45:12:4512 info: Express REST API running at http://localhost:4000/api
+2025-09-17 13:45:12:4512 info: Apollo GraphQL running at http://localhost:4000/graphql
+2025-09-17 13:45:12:4512 info: GraphQL subscriptions running at ws://localhost:4000/graphql
+2025-09-17 13:45:14:4514 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 13:45:14:4514 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 13:45:14:4514 http: POST /graphql 200 68.326 ms - {"query":"\n    query IntrospectionQuery {\n      __schema {\n        \n        queryType { name }\n        mutationType { name }\n        subscriptionType { name }\n        types {\n          ...FullType\n        }\n        directives {\n          name\n          description\n          \n          locations\n          args(includeDeprecated: true) {\n            ...InputValue\n          }\n        }\n      }\n    }\n\n    fragment FullType on __Type {\n      kind\n      name\n      description\n      \n      fields(includeDeprecated: true) {\n        name\n        description\n        args(includeDeprecated: true) {\n          ...InputValue\n        }\n        type {\n          ...TypeRef\n        }\n        isDeprecated\n        deprecationReason\n      }\n      inputFields(includeDeprecated: true) {\n        ...InputValue\n      }\n      interfaces {\n        ...TypeRef\n      }\n      enumValues(includeDeprecated: true) {\n        name\n        description\n        isDeprecated\n        deprecationReason\n      }\n      possibleTypes {\n        ...TypeRef\n      }\n    }\n\n    fragment InputValue on __InputValue {\n      name\n      description\n      type { ...TypeRef }\n      defaultValue\n      isDeprecated\n      deprecationReason\n    }\n\n    fragment TypeRef on __Type {\n      kind\n      name\n      ofType {\n        kind\n        name\n        ofType {\n          kind\n          name\n          ofType {\n            kind\n            name\n            ofType {\n              kind\n              name\n              ofType {\n                kind\n                name\n                ofType {\n                  kind\n                  name\n                  ofType {\n                    kind\n                    name\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  ","operationName":"IntrospectionQuery"}
+2025-09-17 13:45:19:4519 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 13:45:19:4519 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 13:45:19:4519 http: POST /graphql 200 28.835 ms - {"query":"\n    query IntrospectionQuery {\n      __schema {\n        \n        queryType { name }\n        mutationType { name }\n        subscriptionType { name }\n        types {\n          ...FullType\n        }\n        directives {\n          name\n          description\n          \n          locations\n          args(includeDeprecated: true) {\n            ...InputValue\n          }\n        }\n      }\n    }\n\n    fragment FullType on __Type {\n      kind\n      name\n      description\n      \n      fields(includeDeprecated: true) {\n        name\n        description\n        args(includeDeprecated: true) {\n          ...InputValue\n        }\n        type {\n          ...TypeRef\n        }\n        isDeprecated\n        deprecationReason\n      }\n      inputFields(includeDeprecated: true) {\n        ...InputValue\n      }\n      interfaces {\n        ...TypeRef\n      }\n      enumValues(includeDeprecated: true) {\n        name\n        description\n        isDeprecated\n        deprecationReason\n      }\n      possibleTypes {\n        ...TypeRef\n      }\n    }\n\n    fragment InputValue on __InputValue {\n      name\n      description\n      type { ...TypeRef }\n      defaultValue\n      isDeprecated\n      deprecationReason\n    }\n\n    fragment TypeRef on __Type {\n      kind\n      name\n      ofType {\n        kind\n        name\n        ofType {\n          kind\n          name\n          ofType {\n            kind\n            name\n            ofType {\n              kind\n              name\n              ofType {\n                kind\n                name\n                ofType {\n                  kind\n                  name\n                  ofType {\n                    kind\n                    name\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  ","operationName":"IntrospectionQuery"}
+2025-09-17 13:45:24:4524 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 13:45:24:4524 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 13:45:24:4524 http: POST /graphql 200 21.114 ms - {"query":"\n    query IntrospectionQuery {\n      __schema {\n        \n        queryType { name }\n        mutationType { name }\n        subscriptionType { name }\n        types {\n          ...FullType\n        }\n        directives {\n          name\n          description\n          \n          locations\n          args(includeDeprecated: true) {\n            ...InputValue\n          }\n        }\n      }\n    }\n\n    fragment FullType on __Type {\n      kind\n      name\n      description\n      \n      fields(includeDeprecated: true) {\n        name\n        description\n        args(includeDeprecated: true) {\n          ...InputValue\n        }\n        type {\n          ...TypeRef\n        }\n        isDeprecated\n        deprecationReason\n      }\n      inputFields(includeDeprecated: true) {\n        ...InputValue\n      }\n      interfaces {\n        ...TypeRef\n      }\n      enumValues(includeDeprecated: true) {\n        name\n        description\n        isDeprecated\n        deprecationReason\n      }\n      possibleTypes {\n        ...TypeRef\n      }\n    }\n\n    fragment InputValue on __InputValue {\n      name\n      description\n      type { ...TypeRef }\n      defaultValue\n      isDeprecated\n      deprecationReason\n    }\n\n    fragment TypeRef on __Type {\n      kind\n      name\n      ofType {\n        kind\n        name\n        ofType {\n          kind\n          name\n          ofType {\n            kind\n            name\n            ofType {\n              kind\n              name\n              ofType {\n                kind\n                name\n                ofType {\n                  kind\n                  name\n                  ofType {\n                    kind\n                    name\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  ","operationName":"IntrospectionQuery"}
+2025-09-17 13:45:27:4527 http: GraphQL request started: Query (query Query {
+  hello
+}...)
+2025-09-17 13:45:27:4527 debug: GraphQL hello query executed
+2025-09-17 13:45:27:4527 http: GraphQL request completed: Query
+2025-09-17 13:45:27:4527 http: POST /graphql 200 23.939 ms - {"query":"query Query {\n  hello\n}","variables":{},"operationName":"Query"}
+2025-09-17 13:45:29:4529 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 13:45:29:4529 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 13:45:29:4529 http: POST /graphql 200 19.340 ms - {"query":"\n    query IntrospectionQuery {\n      __schema {\n        \n        queryType { name }\n        mutationType { name }\n        subscriptionType { name }\n        types {\n          ...FullType\n        }\n        directives {\n          name\n          description\n          \n          locations\n          args(includeDeprecated: true) {\n            ...InputValue\n          }\n        }\n      }\n    }\n\n    fragment FullType on __Type {\n      kind\n      name\n      description\n      \n      fields(includeDeprecated: true) {\n        name\n        description\n        args(includeDeprecated: true) {\n          ...InputValue\n        }\n        type {\n          ...TypeRef\n        }\n        isDeprecated\n        deprecationReason\n      }\n      inputFields(includeDeprecated: true) {\n        ...InputValue\n      }\n      interfaces {\n        ...TypeRef\n      }\n      enumValues(includeDeprecated: true) {\n        name\n        description\n        isDeprecated\n        deprecationReason\n      }\n      possibleTypes {\n        ...TypeRef\n      }\n    }\n\n    fragment InputValue on __InputValue {\n      name\n      description\n      type { ...TypeRef }\n      defaultValue\n      isDeprecated\n      deprecationReason\n    }\n\n    fragment TypeRef on __Type {\n      kind\n      name\n      ofType {\n        kind\n        name\n        ofType {\n          kind\n          name\n          ofType {\n            kind\n            name\n            ofType {\n              kind\n              name\n              ofType {\n                kind\n                name\n                ofType {\n                  kind\n                  name\n                  ofType {\n                    kind\n                    name\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  ","operationName":"IntrospectionQuery"}
+2025-09-17 13:45:33:4533 info: Shutting down server...
+2025-09-17 14:21:42:2142 info: Starting server...
+2025-09-17 14:21:42:2142 info: Apollo Server started
+2025-09-17 14:21:42:2142 info: Server running in development mode
+2025-09-17 14:21:42:2142 info: Express REST API running at http://localhost:4000/api
+2025-09-17 14:21:42:2142 info: Apollo GraphQL running at http://localhost:4000/graphql
+2025-09-17 14:21:42:2142 info: GraphQL subscriptions running at ws://localhost:4000/graphql
+2025-09-17 14:21:44:2144 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:21:45:2145 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:21:46:2146 http: GET /graphql 200 11.076 ms - {}
+2025-09-17 14:21:47:2147 http: GET /favicon.ico 404 3.427 ms - {}
+2025-09-17 14:21:52:2152 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:21:52:2152 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:21:57:2157 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:21:58:2158 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:22:02:222 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:22:03:223 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:22:07:227 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:22:08:228 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:22:12:2212 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:22:13:2213 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:22:17:2217 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:22:17:2217 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:22:22:2222 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:22:22:2222 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:22:26:2226 info: Starting server...
+2025-09-17 14:22:27:2227 info: Apollo Server started
+2025-09-17 14:22:27:2227 info: Server running in development mode
+2025-09-17 14:22:27:2227 info: Express REST API running at http://localhost:4000/api
+2025-09-17 14:22:27:2227 info: Apollo GraphQL running at http://localhost:4000/graphql
+2025-09-17 14:22:27:2227 info: GraphQL subscriptions running at ws://localhost:4000/graphql
+2025-09-17 14:22:28:2228 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:22:28:2228 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:22:32:2232 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:22:33:2233 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:22:37:2237 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:22:37:2237 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:22:42:2242 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:22:42:2242 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:22:47:2247 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:22:47:2247 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:22:52:2252 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:22:53:2253 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:22:57:2257 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:22:57:2257 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:23:03:233 info: Starting server...
+2025-09-17 14:23:03:233 info: Apollo Server started
+2025-09-17 14:23:03:233 info: Server running in development mode
+2025-09-17 14:23:03:233 info: Express REST API running at http://localhost:4000/api
+2025-09-17 14:23:03:233 info: Apollo GraphQL running at http://localhost:4000/graphql
+2025-09-17 14:23:03:233 info: GraphQL subscriptions running at ws://localhost:4000/graphql
+2025-09-17 14:23:03:233 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:23:03:233 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:23:07:237 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:23:07:237 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:23:12:2312 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:23:13:2313 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:23:17:2317 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:23:17:2317 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:23:22:2322 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:23:23:2323 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:23:27:2327 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:23:28:2328 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:23:32:2332 info: Starting server...
+2025-09-17 14:23:32:2332 info: Apollo Server started
+2025-09-17 14:23:32:2332 info: Server running in development mode
+2025-09-17 14:23:32:2332 info: Express REST API running at http://localhost:4000/api
+2025-09-17 14:23:32:2332 info: Apollo GraphQL running at http://localhost:4000/graphql
+2025-09-17 14:23:32:2332 info: GraphQL subscriptions running at ws://localhost:4000/graphql
+2025-09-17 14:23:33:2333 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:23:33:2333 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:23:37:2337 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:23:37:2337 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:23:42:2342 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:23:42:2342 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:23:47:2347 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:23:47:2347 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:23:50:2350 info: Starting server...
+2025-09-17 14:23:50:2350 info: Apollo Server started
+2025-09-17 14:23:50:2350 info: Server running in development mode
+2025-09-17 14:23:50:2350 info: Express REST API running at http://localhost:4000/api
+2025-09-17 14:23:50:2350 info: Apollo GraphQL running at http://localhost:4000/graphql
+2025-09-17 14:23:50:2350 info: GraphQL subscriptions running at ws://localhost:4000/graphql
+2025-09-17 14:23:53:2353 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:23:53:2353 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:23:57:2357 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:23:58:2358 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:24:02:242 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:24:02:242 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:24:07:247 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:24:07:247 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:24:12:2412 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:24:13:2413 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:24:17:2417 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:24:17:2417 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:24:22:2422 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:24:22:2422 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:24:27:2427 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:24:27:2427 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:24:32:2432 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:24:32:2432 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:24:37:2437 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:24:38:2438 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:24:42:2442 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:24:43:2443 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:24:47:2447 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:24:47:2447 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:24:52:2452 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:24:52:2452 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:24:57:2457 http: GraphQL request started: IntrospectionQuery (
+    query IntrospectionQuery {
+      __schema {
+        
+        queryType { name }
+        mutatio...)
+2025-09-17 14:24:57:2457 http: GraphQL request completed: IntrospectionQuery
+2025-09-17 14:25:01:251 info: Shutting down server...
+2025-09-17 14:55:07:557 info: Starting server...
+2025-09-17 14:55:08:558 info: Apollo Server started
+2025-09-17 14:55:08:558 info: Server running in development mode
+2025-09-17 14:55:08:558 info: Express REST API running at http://localhost:4000/api
+2025-09-17 14:55:08:558 info: Apollo GraphQL running at http://localhost:4000/graphql
+2025-09-17 14:55:08:558 info: GraphQL subscriptions running at ws://localhost:4000/graphql
+2025-09-17 14:55:12:5512 http: GraphQL request started: Query (query Query { hello }...)
+2025-09-17 14:55:12:5512 debug: GraphQL hello query executed
+2025-09-17 14:55:12:5512 http: GraphQL request completed: Query
+2025-09-17 14:55:12:5512 http: POST /graphql 200 5.324 ms - {"query":"query Query {\n  hello\n}","variables":{},"operationName":"Query"}
+2025-09-17 15:01:34:134 info: Starting server...
+2025-09-17 15:01:34:134 info: Apollo Server started
+2025-09-17 15:01:34:134 info: Server running in development mode
+2025-09-17 15:01:34:134 info: Express REST API running at http://localhost:4000/api
+2025-09-17 15:01:34:134 info: Apollo GraphQL running at http://localhost:4000/graphql
+2025-09-17 15:01:34:134 info: GraphQL subscriptions running at ws://localhost:4000/graphql
+2025-09-17 15:05:21:521 info: Starting server...
+2025-09-17 15:05:22:522 info: Apollo Server started
+2025-09-17 15:05:22:522 info: Server running in development mode
+2025-09-17 15:05:22:522 info: Express REST API running at http://localhost:4000/api
+2025-09-17 15:05:22:522 info: Apollo GraphQL running at http://localhost:4000/graphql
+2025-09-17 15:05:22:522 info: GraphQL subscriptions running at ws://localhost:4000/graphql
+2025-09-17 15:07:38:738 info: Starting server...
+2025-09-17 15:07:38:738 info: Apollo Server started
+2025-09-17 15:07:38:738 info: Server started successfully
+2025-09-17 15:07:38:738 info: Server running in development mode
+2025-09-17 15:07:38:738 info: Express REST API running at http://localhost:4000/api
+2025-09-17 15:07:38:738 info: Apollo GraphQL running at http://localhost:4000/graphql
+2025-09-17 15:07:38:738 info: GraphQL subscriptions running at ws://localhost:4000/graphql
+2025-09-17 15:15:52:1552 info: Starting server...
+2025-09-17 15:15:52:1552 info: Apollo Server started
+2025-09-17 15:15:52:1552 info: Server started successfully
+2025-09-17 15:15:52:1552 info: Server running in development mode
+2025-09-17 15:15:52:1552 info: Express REST API running at http://localhost:4000/api
+2025-09-17 15:15:52:1552 info: Apollo GraphQL running at http://localhost:4000/graphql
+2025-09-17 15:15:52:1552 info: GraphQL subscriptions running at ws://localhost:4000/graphql
+2025-09-17 15:15:59:1559 info: Starting server...
+2025-09-17 15:15:59:1559 info: Apollo Server started
+2025-09-17 15:15:59:1559 info: Server started successfully
+2025-09-17 15:15:59:1559 info: Server running in development mode
+2025-09-17 15:15:59:1559 info: Express REST API running at http://localhost:4000/api
+2025-09-17 15:15:59:1559 info: Apollo GraphQL running at http://localhost:4000/graphql
+2025-09-17 15:15:59:1559 info: GraphQL subscriptions running at ws://localhost:4000/graphql
+2025-09-17 15:16:24:1624 http: GraphQL request started: Query (query Query { hello }...)
+2025-09-17 15:16:24:1624 debug: GraphQL hello query executed
+2025-09-17 15:16:24:1624 http: GraphQL request completed: Query
+2025-09-17 15:16:24:1624 http: POST /graphql 200 33.055 ms - {"query":"query Query {\n  hello\n}","variables":{},"operationName":"Query"}
+2025-09-17 15:16:34:1634 info: Starting server...
+2025-09-17 15:16:34:1634 info: Apollo Server started
+2025-09-17 15:16:34:1634 info: Server started successfully
+2025-09-17 15:16:34:1634 info: Server running in development mode
+2025-09-17 15:16:34:1634 info: Express REST API running at http://localhost:4000/api
+2025-09-17 15:16:34:1634 info: Apollo GraphQL running at http://localhost:4000/graphql
+2025-09-17 15:16:34:1634 info: GraphQL subscriptions running at ws://localhost:4000/graphql
+2025-09-17 15:19:34:1934 info: Shutting down server...

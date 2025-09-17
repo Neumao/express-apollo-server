@@ -1,0 +1,60 @@
+You are an experienced Architect Engineer with a strong background in backend development. Your task is to design and implement a scalable, optimized Node.js backend server that serves services to clients. The server must integrate both GraphQL and REST APIs, with support for PubSub for real-time features. Follow industry best practices, including proper folder structure, modularity, error handling, security, logging, and performance optimizations.
+
+### Key Technologies and Requirements:
+- **Node.js**: Use the latest stable version for the runtime.
+- **Express**: For handling REST APIs, routing, and middleware.
+- **Apollo Server**: For setting up the GraphQL server.
+- **GraphQL**: Define schemas, queries, mutations, and subscriptions.
+- **Prisma**: As the ORM for database interactions. Assume PostgreSQL as the database (configure via Prisma schema). Create a `User` model with fields including: id (UUID, primary key), email (unique), passwordHash (string), role (enum: 'user', 'admin'), authToken (string, optional), refreshToken (string, optional), resetPasswordToken (string, optional), resetPasswordExpires (DateTime, optional), emailVerificationToken (string, optional), createdAt (DateTime), updatedAt (DateTime). Add any other necessary fields for token management.
+- **PubSub**: Use Apollo's PubSub for GraphQL subscriptions (in-memory for simplicity, but note scalability limits; suggest Redis for production).
+- **REST APIs**: Consume and expose REST endpoints alongside GraphQL.
+- **Logging**: Implement comprehensive logging using Winston, with levels (info, error, etc.), file rotation, and console output.
+- **Email Server**: Integrate Nodemailer for sending emails (e.g., for verification, password reset). Configure with SMTP (use environment variables for credentials).
+- **Authentication and Authorization**: 
+  - Support both REST and GraphQL.
+  - Use JWT for Bearer tokens (with refresh tokens for longevity).
+  - Implement login (generate tokens), logout (invalidate tokens, e.g., via blacklisting or short expiry).
+  - Role-based access control (RBAC): Middleware to check roles (e.g., admin-only endpoints).
+  - Some endpoints/queries don't require auth (e.g., login, public info).
+  - Secure both sides: Use Apollo context for GraphQL auth, Express middleware for REST.
+- **Additional Features**:
+  - A special REST API endpoint (e.g., /analytics) that renders a basic HTML page displaying: last API response time, usage analytics (e.g., request counts), and recent logs (paginated or limited).
+  - Implement global middlewares for logging, rate limiting (using express-rate-limit), CORS, and error handling.
+  - Ensure the server is scalable: Use clustering or PM2 for multi-core, optimize queries with Prisma accelerators if needed.
+  - Environment configuration: Use dotenv for .env files (e.g., DB_URL, JWT_SECRET, EMAIL_SMTP_HOST).
+  - Testing: Include basic setup for Jest unit/integration tests.
+  - Security: Hash passwords with bcrypt, validate inputs with Joi or GraphQL scalars.
+
+### Project Structure:
+Organize the code in a `src` folder as follows:
+- **src/index.js**: Entry point to set up and start the server (integrate Express and Apollo).
+- **src/graphql**: Subfolders for schema (schema.js), resolvers (queries.js, mutations.js, subscriptions.js), pubsub (pubsub.js), and types (if needed).
+- **src/prisma**: Contains schema.prisma, migrations, and client setup (prisma.js).
+- **src/express**: 
+  - **controllers**: Logic for REST endpoints (e.g., authController.js, analyticsController.js).
+  - **services**: Business logic (e.g., authService.js, emailService.js, userService.js).
+  - **routes**: Routers (e.g., authRouter.js, analyticsRouter.js).
+  - **middlewares**: Auth middleware (authMiddleware.js), role middleware (roleMiddleware.js), logging middleware, etc.
+- **src/config**: For configurations (e.g., logger.js, email.js).
+- **src/utils**: Helpers (e.g., jwtUtils.js, errorHandler.js).
+- Root: package.json, .env.example, README.md with setup instructions.
+
+### Implementation Guidelines:
+- Server Setup: Mount Apollo on /graphql and REST routes on /api. Use http.createServer for integration.
+- GraphQL: Define basic schemas (e.g., User type, Query: getUser, Mutation: login, signup, Subscription: userUpdated). Use context for auth.
+- REST: Endpoints like POST /api/auth/login, POST /api/auth/logout, GET /api/user (protected), GET /analytics (renders HTML).
+- PubSub: Example subscription for real-time user updates.
+- Database: Run Prisma migrations in setup.
+- Analytics HTML: Simple template with placeholders for dynamic data (use EJS or inline HTML).
+- Full Implementation: Provide complete, runnable code for all files. Use async/await, handle errors gracefully. Make it production-ready with optimizations like caching (optional Redis).
+
+If any details are unclear (e.g., specific database, additional endpoints, custom roles, or email provider), ask clarifying questions before proceeding. Once ready, output the full code structure with file contents in a code-block format for easy copying. Start implementing now.
+
+before starting give me npm i (all packages to install and according to that generate the code)
+
+make express and graphql seperate folder to handle 
+1.give me npm i latest dependencies and dev - dependencies to install
+2. create simple express and graphql server i think (drained server will be used)
+3. graphql server will be used 
+after testing we will look again what to do
+simple 

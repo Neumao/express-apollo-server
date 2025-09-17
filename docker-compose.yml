@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: express_apollo_postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: express_apollo_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Uncomment the pgadmin section if you want a visual database management tool
+  # pgadmin:
+  #   image: dpage/pgadmin4:latest
+  #   container_name: express_apollo_pgadmin
+  #   restart: always
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@admin.com
+  #     PGADMIN_DEFAULT_PASSWORD: admin
+  #   ports:
+  #     - "5050:80"
+  #   depends_on:
+  #     - postgres
+
+volumes:
+  postgres_data:

@@ -1,0 +1,13 @@
+{
+  // "editor.tabSize": 2,
+  // "editor.formatOnSave": true,
+  // "editor.codeActionsOnSave": {
+  //   "source.fixAll.eslint": "explicit"
+  // },
+  // "javascript.updateImportsOnFileMove.enabled": "always",
+  // "files.eol": "\n",
+  // "files.insertFinalNewline": true,
+  // "files.trimTrailingWhitespace": true,
+  // "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+  // "javascript.format.insertSpaceBeforeFunctionParenthesis": false
+}

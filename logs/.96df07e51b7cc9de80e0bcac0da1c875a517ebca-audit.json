@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 7
+    },
+    "auditLog": "C:\\Neumao\\express-apollo-server\\logs\\.96df07e51b7cc9de80e0bcac0da1c875a517ebca-audit.json",
+    "files": [
+        {
+            "date": 1758097333980,
+            "name": "C:\\Neumao\\express-apollo-server\\logs\\error-2025-09-17.log",
+            "hash": "32918fd6c2cee3a78f66ccbdad7828b2d0f973a8d3ded8efb0cdbb0147309a00"
+        }
+    ],
+    "hashType": "sha256"
+}
