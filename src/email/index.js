@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
-import { config } from '../index.js';
-import { logger } from '../logger.js';
+import { config } from '../config/index.js';
+import { logger } from '../config/logger.js';
 
 /**
  * Create a NodeMailer transporter based on environment configuration
@@ -16,7 +16,7 @@ const createTransporter = () => {
     }
 
     // Create real transporter with configured settings
-    const transporter = nodemailer.createTransport({
+    const transporter = nodemailer.createTransporter({
         host,
         port,
         secure,
@@ -42,7 +42,7 @@ const createTestTransporter = async () => {
         });
 
         // Create a reusable transporter using the test account
-        const transporter = nodemailer.createTransport({
+        const transporter = nodemailer.createTransporter({
             host: 'smtp.ethereal.email',
             port: 587,
             secure: false,

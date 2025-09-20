@@ -1,17 +1,17 @@
 import bcrypt from 'bcrypt';
-import { logger } from '../../config/logger.js';
-import { generateAccessToken, generateRefreshToken } from '../../utils/jwtUtils.js';
-import { ValidationError, ForbiddenError, NotFoundError, ConflictError, UnauthorizedError } from '../../utils/errors.js';
-import { publish, TOPICS } from '../pubsub/index.js';
-
-import { apiResponse } from '../../utils/response.js';
-import prisma from '../../../prisma/client.js';
-import config from '../../config/env.js';
+import { logger } from '../../../config/logger.js';
+import { generateAccessToken, generateRefreshToken } from '../../../utils/jwtUtils.js';
+import { ValidationError, ForbiddenError, NotFoundError, ConflictError, UnauthorizedError } from '../../../utils/errors.js';
+import { publish, TOPICS } from '../../pubsub/index.js';
+import { apiResponse } from '../../../utils/response.js';
+import prisma from '../../../../prisma/client.js';
+import config from '../../../config/env.js';
 
 /**
- * GraphQL Mutation Resolvers
+ * User Domain - Mutation Resolvers
+ * Contains all user-related mutations: register, login, logout, updateUser, deleteUser
  */
-const mutations = {
+export const userMutations = {
     /**
      * Register a new user
      */
@@ -97,25 +97,31 @@ const mutations = {
             where: { id: user.id },
             data: {
                 authToken: accessToken,
-                authTokenExpiry: new Date(Date.now() + expirationTime * 1000).toISOString(), // Corrected to ensure valid Date
+                authTokenExpiry: new Date(Date.now() + expirationTime * 1000).toISOString(),
                 lastLoginAt: new Date(),
             },
         });
 
-        // Set refresh token in HTTP-only cookie
+        // Set refresh token as HTTP-only cookie
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: config.nodeEnv === 'production',
             sameSite: 'strict',
-            maxAge: config.jwt.refreshExpiration * 1000, // Convert seconds to milliseconds
+            maxAge: config.jwt.refreshExpiration * 1000,
         });
 
         logger.info(`User logged in via GraphQL: ${user.id}`);
+
+        // Return user data with access token
+        const userWithToken = {
+            ...user,
+            authToken: accessToken,
+        };
+
         return apiResponse({
             status: true,
             message: 'Login successful',
-            data: user,
-
+            data: userWithToken,
         });
     },
 
@@ -123,11 +129,9 @@ const mutations = {
      * Logout user
      */
     logout: async (_, __, { user, res }) => {
-        console.log(user)
         if (!user) {
             logger.error('Logout attempt without authentication');
             throw new ForbiddenError('Authentication required');
-
         }
 
         await prisma.user.update({
@@ -158,9 +162,6 @@ const mutations = {
     /**
      * Update user profile
      */
-    /**
-     * Generate test cases to test SYSADMIN and ADMIN logic 
-     */
     updateUser: async (_, { input }, { user }) => {
         // Id not provided
         const { id } = input;
@@ -173,7 +174,6 @@ const mutations = {
         }
 
         // Only allow users to update their own profile or admins to update any profile
-
         // Only SYSADMIN and ADMIN can update other user profiles
         if (user.id !== id && user.role !== 'ADMIN' && user.role !== 'SYSADMIN') {
             throw new ForbiddenError('Not authorized to update this profile');
@@ -202,10 +202,7 @@ const mutations = {
                 data: updatePayload,
             });
 
-            logger.info(`User updated via GraphQL: ${id}`);
-
-            // Publish user updated event
-            publish(TOPICS.USER_UPDATED, { userUpdated: { user: updatedUser } });
+            logger.info(`User updated via GraphQL: ${updatedUser.id}`);
 
             return apiResponse({
                 status: true,
@@ -216,12 +213,13 @@ const mutations = {
             if (error.code === 'P2025') {
                 throw new NotFoundError('User not found');
             }
+            logger.error(`Error updating user via GraphQL: ${error.message}`);
             throw error;
         }
     },
 
     /**
-     * Delete user account
+     * Delete user
      */
     deleteUser: async (_, { id }, { user }) => {
         // Ensure user is authorized
@@ -229,56 +227,34 @@ const mutations = {
             throw new ForbiddenError('Authentication required');
         }
 
-        // Only allow admins or system to delete any account not their own accounts
-        if (user.id == id) {
-            throw new ForbiddenError('Users cannot delete their own account');
+        // Only SYSADMIN and ADMIN can delete users
+        if (user.role !== 'ADMIN' && user.role !== 'SYSADMIN') {
+            throw new ForbiddenError('Not authorized to delete users');
         }
-        if (user.id !== id && user.role !== 'ADMIN' && user.role !== 'SYSADMIN') {
-            throw new ForbiddenError('Not authorized to delete this account');
+
+        // Prevent users from deleting themselves
+        if (user.id === id) {
+            throw new ValidationError('Cannot delete your own account');
         }
 
         try {
-            await prisma.user.delete({
+            const deletedUser = await prisma.user.delete({
                 where: { id },
             });
 
-            logger.info(`User deleted via GraphQL: ${id}`);
-
-            // Publish user deleted event
-            publish(TOPICS.USER_DELETED, { userDeleted: { userId: id } });
+            logger.info(`User deleted via GraphQL: ${deletedUser.id}`);
 
             return apiResponse({
                 status: true,
                 message: 'User deleted successfully',
-                data: null,
+                data: deletedUser,
             });
         } catch (error) {
             if (error.code === 'P2025') {
                 throw new NotFoundError('User not found');
             }
+            logger.error(`Error deleting user via GraphQL: ${error.message}`);
             throw error;
         }
     },
-
-    /**
-     * Test mutation to trigger subscription
-     */
-    triggerTestSubscription: async (_, { message }) => {
-        const testPayload = {
-            id: Date.now().toString(),
-            message: message || 'Test message from GraphQL mutation',
-            timestamp: new Date().toISOString(),
-        };
-
-        logger.info(`🚀 Triggering subscription event with message: "${testPayload.message}"`);
-
-        // Publish the event to subscribers
-        await publish(TOPICS.TEST_SUBSCRIPTION, { testSubscription: testPayload });
-
-        logger.info(`📤 Subscription event published successfully`);
-
-        return testPayload;
-    }
 };
-
-export default mutations;

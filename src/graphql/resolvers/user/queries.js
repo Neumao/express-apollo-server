@@ -1,23 +1,13 @@
-import prisma from '../../../prisma/client.js';
-import { logger } from '../../config/index.js';
-import { ForbiddenError, NotFoundError } from '../../utils/errors.js';
-
-import { apiResponse } from '../../utils/response.js';
+import prisma from '../../../../prisma/client.js';
+import { logger } from '../../../config/index.js';
+import { ForbiddenError, NotFoundError } from '../../../utils/errors.js';
+import { apiResponse } from '../../../utils/response.js';
 
 /**
- * GraphQL Query Resolvers
+ * User Domain - Query Resolvers
+ * Contains all user-related queries: me, user, users
  */
-const queries = {
-    // Hello world query for testing
-    hello: () => {
-        logger.debug('GraphQL hello query executed');
-        return apiResponse({
-            status: true,
-            message: 'Hello from Apollo Server!',
-            data: null,
-        });
-    },
-
+export const userQueries = {
     // Get authenticated user's profile
     me: (_, __, { user }) => {
         if (!user) {
@@ -67,5 +57,3 @@ const queries = {
         });
     }
 };
-
-export default queries;

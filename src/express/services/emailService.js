@@ -1,5 +1,5 @@
-import { sendEmail } from '../../config/email/index.js';
-import { renderEmailTemplate } from '../../config/email/templates.js';
+import { sendEmail } from '../../email/index.js';
+import { renderEmailTemplate } from '../../email/templates.js';
 import { logger } from '../../config/logger.js';
 import { config } from '../../config/index.js';
 

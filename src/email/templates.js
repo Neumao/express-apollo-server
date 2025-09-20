@@ -1,5 +1,6 @@
 /**
- * Email template for welcome/verification
+ * Email template utilities using Handlebars
+ */
 
 import handlebars from 'handlebars';
 import fs from 'fs/promises';
@@ -12,8 +13,8 @@ import path from 'path';
  * @returns {Promise<string>} Rendered HTML string
  */
 export async function renderEmailTemplate(templateName, context) {
-  const templatePath = path.join(process.cwd(), 'src', 'config', 'email', 'templates', `${templateName}.hbs`);
-  const source = await fs.readFile(templatePath, 'utf8');
-  const template = handlebars.compile(source);
-  return template(context);
+    const templatePath = path.join(process.cwd(), 'src', 'email', 'templates', `${templateName}.hbs`);
+    const source = await fs.readFile(templatePath, 'utf8');
+    const template = handlebars.compile(source);
+    return template(context);
 }

@@ -1,12 +1,12 @@
-import { pubsub, TOPICS } from '../pubsub/index.js';
-import { ForbiddenError } from '../../utils/errors.js';
-import { logger } from '../../config/logger.js';
+import { pubsub, TOPICS } from '../../pubsub/index.js';
+import { ForbiddenError } from '../../../utils/errors.js';
+import { logger } from '../../../config/logger.js';
 
 /**
- * Apollo Server v5 GraphQL Subscription Resolvers
- * Using native async generators and EventEmitter with authentication
+ * Base Domain - Subscription Resolvers
+ * Contains common/shared subscriptions like test subscriptions, system notifications, etc.
  */
-const subscriptions = {
+export const baseSubscriptions = {
     testSubscription: {
         // Apollo v5 style subscription using async generator with authentication
         subscribe: async function* (parent, args, context) {
@@ -46,6 +46,11 @@ const subscriptions = {
             }
         },
     },
-};
 
-export default subscriptions;
+    // Base placeholder subscriptions
+    _: {
+        subscribe: async function* () {
+            yield { _: true };
+        }
+    },
+};
