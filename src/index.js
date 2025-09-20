@@ -53,7 +53,7 @@ async function startServer() {
                 // Extract authentication token from connection params or headers
                 const connectionParams = ctx.connectionParams || {};
                 const authorization = connectionParams.authorization || connectionParams.Authorization;
-                
+
                 try {
                     if (authorization) {
                         const token = extractTokenFromHeader(authorization);
@@ -63,7 +63,7 @@ async function startServer() {
                             return { user, authenticated: true };
                         }
                     }
-                    
+
                     logger.debug('🔓 WebSocket connection without authentication');
                     return { user: null, authenticated: false };
                 } catch (error) {

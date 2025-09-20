@@ -11,13 +11,13 @@ const subscriptions = {
         // Apollo v5 style subscription using async generator with authentication
         subscribe: async function* (parent, args, context) {
             logger.info('🚀 Starting testSubscription with Apollo v5 native async iterator');
-            
+
             // Check authentication for subscription access
             if (!context.authenticated || !context.user) {
                 logger.warn('🚫 Unauthorized subscription attempt');
                 throw new ForbiddenError('Authentication required for subscriptions');
             }
-            
+
             logger.info(`🔐 Authenticated subscription for user: ${context.user.id} (${context.user.email})`);
 
             // Start listening for events FIRST
