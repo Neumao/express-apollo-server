@@ -258,6 +258,26 @@ const mutations = {
             }
             throw error;
         }
+    },
+
+    /**
+     * Test mutation to trigger subscription
+     */
+    triggerTestSubscription: async (_, { message }) => {
+        const testPayload = {
+            id: Date.now().toString(),
+            message: message || 'Test message from GraphQL mutation',
+            timestamp: new Date().toISOString(),
+        };
+
+        logger.info(`🚀 Triggering subscription event with message: "${testPayload.message}"`);
+
+        // Publish the event to subscribers
+        await publish(TOPICS.TEST_SUBSCRIPTION, { testSubscription: testPayload });
+
+        logger.info(`📤 Subscription event published successfully`);
+
+        return testPayload;
     }
 };
 

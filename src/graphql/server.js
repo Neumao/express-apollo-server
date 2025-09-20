@@ -1,4 +1,6 @@
 import { ApolloServer } from '@apollo/server';
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 import { logger } from '../config/index.js';
 import typeDefs from './schema/index.js';
 import resolvers from './resolvers/index.js';
@@ -10,9 +12,11 @@ export const serverStatus = {
     startError: null
 };
 
+// Create executable schema for both HTTP and WebSocket
+const schema = makeExecutableSchema({ typeDefs, resolvers });
+
 const apolloServer = new ApolloServer({
-    typeDefs,
-    resolvers,
+    schema, // Use schema instead of typeDefs + resolvers for v5 subscriptions
     introspection: process.env.NODE_ENV !== 'production',
     formatError: (formattedError, error) => {
         const errorLevel = error instanceof AppError && error.statusCode < 500 ? 'warn' : 'error';
@@ -73,4 +77,4 @@ const apolloServer = new ApolloServer({
     ],
 });
 
-export { apolloServer, createContext };
+export { apolloServer, createContext, schema };
