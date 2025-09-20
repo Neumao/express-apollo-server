@@ -6,9 +6,10 @@ import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHt
 import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/use/ws';
 import { apolloServer, createContext, schema } from './graphql/server.js';
-import { verifyToken, extractTokenFromHeader } from './utils/jwtUtils.js';
+import { verifyToken, extractTokenFromHeader, generateAccessToken, generateRefreshToken } from './utils/jwtUtils.js';
 import expressApp from './express/server.js';
 import { logger, config } from './config/index.js';
+import prisma from '../prisma/client.js';
 import path from 'path';
 import fs from 'fs';
 
@@ -50,17 +51,64 @@ async function startServer() {
         const serverCleanup = useServer({
             schema,
             context: async (ctx, msg, args) => {
-                // Extract authentication token from connection params or headers
+                // Extract authentication tokens from connection params
                 const connectionParams = ctx.connectionParams || {};
                 const authorization = connectionParams.authorization || connectionParams.Authorization;
+                const refreshToken = connectionParams.refreshToken || connectionParams.refresh_token;
 
                 try {
                     if (authorization) {
                         const token = extractTokenFromHeader(authorization);
                         if (token) {
-                            const user = verifyToken(token);
-                            logger.debug(`🔐 WebSocket authenticated for user: ${user.id}`);
-                            return { user, authenticated: true };
+                            try {
+                                const user = verifyToken(token);
+                                logger.debug(`🔐 WebSocket authenticated for user: ${user.id}`);
+                                return { user, authenticated: true };
+                            } catch (tokenError) {
+                                // If access token expired, try refresh token (same logic as context.js)
+                                if (tokenError.name === 'TokenExpiredError' && refreshToken) {
+                                    logger.warn('🔄 Access token expired, attempting refresh for WebSocket');
+
+                                    try {
+                                        // Verify refresh token (using same logic as context.js)
+                                        const user = verifyToken(refreshToken);
+
+                                        // Generate new tokens
+                                        const newAccessToken = generateAccessToken(user);
+                                        const newRefreshToken = generateRefreshToken(user);
+                                        const expirationTime = config.jwt.accessExpiration || 3600;
+
+                                        if (isNaN(expirationTime) || expirationTime <= 0) {
+                                            logger.error(`Invalid JWT access expiration time: ${config.jwt.accessExpiration}`);
+                                            throw new Error('Invalid JWT access expiration time');
+                                        }
+
+                                        // Update database with new token (same as context.js)
+                                        await prisma.user.update({
+                                            where: { id: user.id },
+                                            data: {
+                                                authToken: newAccessToken,
+                                                authTokenExpiry: new Date(Date.now() + expirationTime * 1000).toISOString(),
+                                            },
+                                        });
+
+                                        logger.info(`🔄 Refreshed tokens for WebSocket user: ${user.id}`);
+                                        return {
+                                            user,
+                                            authenticated: true,
+                                            newAccessToken,
+                                            newRefreshToken,
+                                            tokenRefreshed: true
+                                        };
+                                    } catch (refreshError) {
+                                        logger.error('🚫 Refresh token invalid for WebSocket:', refreshError.message);
+                                        return { user: null, authenticated: false, authError: 'Invalid refresh token' };
+                                    }
+                                } else {
+                                    logger.warn('🚫 Token expired and no refresh token provided for WebSocket');
+                                    return { user: null, authenticated: false, authError: tokenError.message };
+                                }
+                            }
                         }
                     }
 
