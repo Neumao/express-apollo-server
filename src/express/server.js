@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { logger, config } from '../config/index.js';
 import {
     loggingMiddleware,
@@ -16,6 +17,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(loggingMiddleware);
+app.use(cookieParser());
+
 
 // Apply rate limiting to all routes
 // app.use(rateLimitMiddleware);

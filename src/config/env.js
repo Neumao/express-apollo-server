@@ -3,9 +3,11 @@
  * Centralizes all environment variable access and provides defaults
  */
 import dotenv from 'dotenv';
+import TimeUtils from '../utils/timeUtils.js';
 
 // Load environment variables from .env file
 dotenv.config();
+
 const config = {
     // Server configuration
     port: process.env.PORT || 4000,
@@ -19,8 +21,8 @@ const config = {
     // JWT configuration
     jwt: {
         secret: process.env.JWT_SECRET || 'your-secret-key-should-be-in-env',
-        accessExpiration: process.env.JWT_ACCESS_EXPIRATION || '15m',
-        refreshExpiration: process.env.JWT_REFRESH_EXPIRATION || '7d',
+        accessExpiration: TimeUtils.parseTimeString(process.env.JWT_ACCESS_EXPIRATION, 3600), // Default to 1 hour
+        refreshExpiration: TimeUtils.parseTimeString(process.env.JWT_REFRESH_EXPIRATION, 86400), // Default to 1 day
     },
 
     // Logging configuration

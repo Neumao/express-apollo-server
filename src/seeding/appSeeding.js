@@ -16,7 +16,7 @@ class appSeeding {
                 await prisma.user.create({
                     data: {
                         email: config.systemUser.email,
-                        passwordHash: hashedPassword,
+                        password: hashedPassword,
                         userName: config.systemUser.userName,
                         role: "SYSADMIN",
                         isVerified: true

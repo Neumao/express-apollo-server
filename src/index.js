@@ -8,6 +8,7 @@ import { logger, config } from './config/index.js';
 import path from 'path';
 import fs from 'fs';
 import { WebSocketServer } from 'ws';
+
 import appSeeding from './seeding/appSeeding.js';
 
 process.on('uncaughtException', (err) => {

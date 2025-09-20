@@ -1,15 +1,22 @@
 const userSchema = `#graphql
   enum UserRole {
-    USER
+    SYSADMIN
     ADMIN
+    USER
     MODERATOR
   }
 
   type User {
     id: ID!
     email: String!
+    userName: String
     firstName: String
     lastName: String
+    profileImageUrl: String
+    isActive: Boolean!
+    isVerified: Boolean!
+    phoneNumber: String
+    authToken:String
     role: UserRole!
     createdAt: DateTime!
     updatedAt: DateTime!
@@ -19,8 +26,12 @@ const userSchema = `#graphql
   input RegisterInput {
     email: String!
     password: String!
+    userName: String
     firstName: String
     lastName: String
+    profileImageUrl: String
+    phoneNumber: String
+    role: UserRole!
   }
 
   input LoginInput {
@@ -29,68 +40,50 @@ const userSchema = `#graphql
   }
 
   input UpdateUserInput {
-    email: String
-    password: String
+    email: String!
+    userName: String
     firstName: String
     lastName: String
-  }
-
-  type AuthPayload {
-    accessToken: String!
-    user: User!
+    profileImageUrl: String
+    phoneNumber: String
+    role: UserRole!
   }
 
   type ResponsePayload {
     status: Boolean!
     message: String!
-    data: JSON
+    data: User
   }
-
-  scalar JSON
-
-  type UserCreatedPayload {
-    user: User!
+  type ResponsePayloadAllUsers {
+    status: Boolean!
+    message: String!
+    data: [User]
   }
-
-  type UserUpdatedPayload {
-    user: User!
+  type ResponseLogout{
+    status: Boolean!
+    message: String!
   }
-
-  type UserDeletedPayload {
-    user: User!
-  }
-    user: User!
-  }
-
-  type UserDeletedPayload {
-    userId: ID!
-  }
-
-  # Placeholder field for empty types
   type Query {
     _: Boolean
     me: ResponsePayload
     user(id: ID!): ResponsePayload
-    users: ResponsePayload
+    users: ResponsePayloadAllUsers
   }
 
-  # Placeholder field for empty types
   type Mutation {
     _: Boolean
     register(input: RegisterInput!): ResponsePayload!
     login(input: LoginInput!): ResponsePayload!
-    refreshToken(token: String!): ResponsePayload!
-    logout: ResponsePayload!
+    logout: ResponseLogout!
     updateUser(id: ID!, input: UpdateUserInput!): ResponsePayload!
     deleteUser(id: ID!): ResponsePayload!
   }
 
-  # Placeholder field for empty types
   type Subscription {
     _: Boolean
-    userCreated: UserCreatedPayload!
-    userUpdated(id: ID!): UserUpdatedPayload!
-    userDeleted: UserDeletedPayload!
+    userCreated: ResponsePayload!
+    userUpdated(id: ID!): ResponsePayload!
+    userDeleted: ResponsePayload!
   }
 `;
 

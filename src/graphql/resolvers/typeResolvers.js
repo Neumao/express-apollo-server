@@ -92,7 +92,7 @@ function parseLiteral(ast) {
 // Type resolvers
 const typeResolvers = {
     DateTime: dateTimeScalar,
-    JSON: jsonScalar,
+    // JSON: jsonScalar,
 };
 
 export default typeResolvers;
