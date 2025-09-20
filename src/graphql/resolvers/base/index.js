@@ -9,10 +9,10 @@ import { baseSubscriptions } from './subscriptions.js';
 export const baseResolvers = {
     // Base queries
     ...baseQueries,
-    
+
     // Base mutations
     ...baseMutations,
-    
+
     // Base subscriptions
     ...baseSubscriptions,
 };

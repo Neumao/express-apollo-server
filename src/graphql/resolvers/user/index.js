@@ -8,10 +8,10 @@ import { userQueries } from './queries.js';
 export const userResolvers = {
     // User mutations
     ...userMutations,
-    
+
     // User queries  
     ...userQueries,
-    
+
     // User subscriptions would go here if we had any user-specific subscriptions
     // For now, subscriptions are handled in the base domain
 };

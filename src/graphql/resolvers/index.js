@@ -15,7 +15,7 @@ const resolvers = {
         // Base/Common queries
         hello: baseResolvers.hello,
         _: baseResolvers._,
-        
+
         // User domain queries
         me: userResolvers.me,
         user: userResolvers.user,
@@ -26,7 +26,7 @@ const resolvers = {
         // Base/Common mutations
         triggerTestSubscription: baseResolvers.triggerTestSubscription,
         _: baseResolvers._,
-        
+
         // User domain mutations
         register: userResolvers.register,
         login: userResolvers.login,
@@ -39,7 +39,7 @@ const resolvers = {
         // Base/Common subscriptions
         testSubscription: baseResolvers.testSubscription,
         _: baseResolvers._,
-        
+
         // User domain subscriptions would go here when added
         // Future: userCreated, userUpdated, etc.
     },
