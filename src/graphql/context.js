@@ -13,10 +13,7 @@ export const createContext = async ({ req, res }) => {
     try {
         // Get token from authorization header
         const authHeader = req?.headers?.authorization;
-        console.log("Auth Header", authHeader)
         const token = extractTokenFromHeader(authHeader);
-        console.log("Token", token)
-
 
         if (!token) {
             return { user: null, res };
@@ -25,7 +22,6 @@ export const createContext = async ({ req, res }) => {
         try {
             // Verify token
             const user = verifyToken(token);
-            console.log("user", user)
             logger.debug(`GraphQL request authenticated for user: ${user.id}`);
             return { user, res };
         } catch (error) {
@@ -55,8 +51,6 @@ export const createContext = async ({ req, res }) => {
                     }
 
                     // Update refresh token in database
-                    console.log("Auth Token", newAccessToken)
-                    console.log("New Refresh Token", newRefreshToken)
                     await prisma.user.update({
                         where: { id: user.id },
                         data: {

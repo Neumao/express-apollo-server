@@ -7,7 +7,11 @@ import expressApp from './express/server.js';
 import { logger, config } from './config/index.js';
 import path from 'path';
 import fs from 'fs';
-import { WebSocketServer } from 'ws';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
+import { execute, subscribe } from 'graphql';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import typeDefs from './graphql/schema/index.js';
+import resolvers from './graphql/resolvers/index.js';
 
 import appSeeding from './seeding/appSeeding.js';
 
@@ -37,11 +41,27 @@ async function startServer() {
         // Create HTTP server
         const server = http.createServer(expressApp);
 
-        // Create WebSocket server for GraphQL subscriptions
-        new WebSocketServer({
-            server,
-            path: '/graphql',
-        });
+        // Create executable schema for subscriptions
+        const schema = makeExecutableSchema({ typeDefs, resolvers });
+
+        // Create SubscriptionServer for WebSocket support
+        const subscriptionServer = SubscriptionServer.create(
+            {
+                schema,
+                execute,
+                subscribe,
+                onConnect: (connectionParams, webSocket) => {
+                    logger.info('Client connected for subscriptions');
+                },
+                onDisconnect: (webSocket) => {
+                    logger.info('Client disconnected from subscriptions');
+                },
+            },
+            {
+                server,
+                path: '/graphql',
+            }
+        );
 
         // Start Apollo Server
         await apolloServer.start();
@@ -76,6 +96,7 @@ async function startServer() {
                 logger.info('HTTP server shut down successfully');
                 apolloServer.stop().then(() => {
                     logger.info('Apollo Server stopped');
+                    subscriptionServer.close();
                     process.exit(0);
                 });
             });

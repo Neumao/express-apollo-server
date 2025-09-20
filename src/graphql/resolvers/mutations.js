@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import { logger } from '../../config/logger.js';
 import { generateAccessToken, generateRefreshToken } from '../../utils/jwtUtils.js';
-import { ValidationError, ForbiddenError, NotFoundError, ConflictError } from '../../utils/errors.js';
+import { ValidationError, ForbiddenError, NotFoundError, ConflictError, UnauthorizedError } from '../../utils/errors.js';
 import { publish, TOPICS } from '../pubsub/index.js';
 
 import { apiResponse } from '../../utils/response.js';
@@ -126,10 +126,7 @@ const mutations = {
         console.log(user)
         if (!user) {
             logger.error('Logout attempt without authentication');
-            return apiResponse({
-                status: false,
-                message: 'Authentication required',
-            });
+            throw new ForbiddenError('Authentication required');
 
         }
 
@@ -161,18 +158,28 @@ const mutations = {
     /**
      * Update user profile
      */
-    updateUser: async (_, { id, input }, { user }) => {
+    /**
+     * Generate test cases to test SYSADMIN and ADMIN logic 
+     */
+    updateUser: async (_, { input }, { user }) => {
+        // Id not provided
+        const { id } = input;
+        if (id === undefined || id === null || id.trim() === '') {
+            throw new ValidationError('User ID is required');
+        }
         // Ensure user is authorized
         if (!user) {
             throw new ForbiddenError('Authentication required');
         }
 
         // Only allow users to update their own profile or admins to update any profile
-        if (user.id !== id && user.role !== 'ADMIN') {
+
+        // Only SYSADMIN and ADMIN can update other user profiles
+        if (user.id !== id && user.role !== 'ADMIN' && user.role !== 'SYSADMIN') {
             throw new ForbiddenError('Not authorized to update this profile');
         }
 
-        const { password, email, ...otherData } = input;
+        const { email, ...otherData } = input;
         const updatePayload = { ...otherData };
 
         // If changing email, check if new email already exists
@@ -186,13 +193,6 @@ const mutations = {
             }
 
             updatePayload.email = email;
-        }
-
-        // If changing password, hash it
-        if (password) {
-            const saltRounds = 10;
-            updatePayload.password = await bcrypt.hash(password, saltRounds);
-            updatePayload.tokenVersion = { increment: 1 }; // Invalidate existing tokens
         }
 
         // Update user
@@ -229,8 +229,11 @@ const mutations = {
             throw new ForbiddenError('Authentication required');
         }
 
-        // Only allow users to delete their own account or admins to delete any account
-        if (user.id !== id && user.role !== 'ADMIN') {
+        // Only allow admins or system to delete any account not their own accounts
+        if (user.id == id) {
+            throw new ForbiddenError('Users cannot delete their own account');
+        }
+        if (user.id !== id && user.role !== 'ADMIN' && user.role !== 'SYSADMIN') {
             throw new ForbiddenError('Not authorized to delete this account');
         }
 

@@ -40,13 +40,14 @@ const userSchema = `#graphql
   }
 
   input UpdateUserInput {
-    email: String!
+    id: ID!
+    email: String
     userName: String
     firstName: String
     lastName: String
     profileImageUrl: String
     phoneNumber: String
-    role: UserRole!
+    role: UserRole
   }
 
   type ResponsePayload {
@@ -75,7 +76,7 @@ const userSchema = `#graphql
     register(input: RegisterInput!): ResponsePayload!
     login(input: LoginInput!): ResponsePayload!
     logout: ResponseLogout!
-    updateUser(id: ID!, input: UpdateUserInput!): ResponsePayload!
+    updateUser(input: UpdateUserInput!): ResponsePayload!
     deleteUser(id: ID!): ResponsePayload!
   }
 
