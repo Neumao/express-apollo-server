@@ -5,6 +5,7 @@ Comprehensive testing guide for the Express Apollo Server covering unit tests, i
 ## Overview
 
 The testing strategy covers:
+
 - **Unit Tests** - Individual functions and components
 - **Integration Tests** - API endpoints and database interactions
 - **GraphQL Tests** - Schema, resolvers, and subscriptions
@@ -83,16 +84,16 @@ tests/
 
 ```javascript
 // tests/setup.test.js
-import { PrismaClient } from '@prisma/client';
-import { execSync } from 'child_process';
+import { PrismaClient } from "@prisma/client";
+import { execSync } from "child_process";
 
 const prisma = new PrismaClient();
 
 // Setup test database
 beforeAll(async () => {
   // Run migrations
-  execSync('npx prisma migrate deploy', {
-    env: { ...process.env, DATABASE_URL: process.env.TEST_DATABASE_URL }
+  execSync("npx prisma migrate deploy", {
+    env: { ...process.env, DATABASE_URL: process.env.TEST_DATABASE_URL },
   });
 });
 
@@ -102,12 +103,12 @@ beforeEach(async () => {
     SELECT tablename FROM pg_tables 
     WHERE schemaname='public'
   `;
-  
+
   const tables = tablenames
     .map(({ tablename }) => tablename)
-    .filter(name => name !== '_prisma_migrations')
-    .map(name => `"public"."${name}"`)
-    .join(', ');
+    .filter((name) => name !== "_prisma_migrations")
+    .map((name) => `"public"."${name}"`)
+    .join(", ");
 
   try {
     await prisma.$executeRawUnsafe(`TRUNCATE TABLE ${tables} CASCADE;`);
@@ -124,14 +125,14 @@ afterAll(async () => {
 // Test utilities
 global.createTestUser = async (userData = {}) => {
   const defaultUser = {
-    name: 'Test User',
-    email: 'test@example.com',
-    password: 'Password123!',
-    role: 'USER'
+    name: "Test User",
+    email: "test@example.com",
+    password: "Password123!",
+    role: "USER",
   };
-  
+
   return await prisma.user.create({
-    data: { ...defaultUser, ...userData }
+    data: { ...defaultUser, ...userData },
   });
 };
 ```
@@ -142,39 +143,43 @@ global.createTestUser = async (userData = {}) => {
 
 ```javascript
 // tests/auth/jwt.test.js
-import { generateTokens, verifyToken, verifyRefreshToken } from '../../src/utils/jwtUtils.js';
+import {
+  generateTokens,
+  verifyToken,
+  verifyRefreshToken,
+} from "../../src/utils/jwtUtils.js";
 
-describe('JWT Utils', () => {
+describe("JWT Utils", () => {
   const testUser = {
-    id: 'test-user-id',
-    email: 'test@example.com',
-    role: 'USER'
+    id: "test-user-id",
+    email: "test@example.com",
+    role: "USER",
   };
 
-  describe('generateTokens', () => {
-    test('should generate valid access and refresh tokens', () => {
+  describe("generateTokens", () => {
+    test("should generate valid access and refresh tokens", () => {
       const tokens = generateTokens(testUser);
-      
-      expect(tokens).toHaveProperty('accessToken');
-      expect(tokens).toHaveProperty('refreshToken');
-      expect(typeof tokens.accessToken).toBe('string');
-      expect(typeof tokens.refreshToken).toBe('string');
+
+      expect(tokens).toHaveProperty("accessToken");
+      expect(tokens).toHaveProperty("refreshToken");
+      expect(typeof tokens.accessToken).toBe("string");
+      expect(typeof tokens.refreshToken).toBe("string");
     });
   });
 
-  describe('verifyToken', () => {
-    test('should verify valid access token', () => {
+  describe("verifyToken", () => {
+    test("should verify valid access token", () => {
       const { accessToken } = generateTokens(testUser);
       const payload = verifyToken(accessToken);
-      
+
       expect(payload.userId).toBe(testUser.id);
       expect(payload.email).toBe(testUser.email);
       expect(payload.role).toBe(testUser.role);
     });
 
-    test('should reject invalid token', () => {
+    test("should reject invalid token", () => {
       expect(() => {
-        verifyToken('invalid-token');
+        verifyToken("invalid-token");
       }).toThrow();
     });
   });
@@ -185,108 +190,100 @@ describe('JWT Utils', () => {
 
 ```javascript
 // tests/auth/auth.test.js
-import request from 'supertest';
-import app from '../../src/index.js';
+import request from "supertest";
+import app from "../../src/index.js";
 
-describe('Authentication', () => {
-  describe('POST /api/auth/register', () => {
-    test('should register user successfully', async () => {
+describe("Authentication", () => {
+  describe("POST /api/auth/register", () => {
+    test("should register user successfully", async () => {
       const userData = {
-        name: 'John Doe',
-        email: 'john@example.com',
-        password: 'Password123!'
+        name: "John Doe",
+        email: "john@example.com",
+        password: "Password123!",
       };
 
       const response = await request(app)
-        .post('/api/auth/register')
+        .post("/api/auth/register")
         .send(userData);
 
       expect(response.status).toBe(201);
-      expect(response.body.status).toBe('success');
-      expect(response.body.data).toHaveProperty('authToken');
-      expect(response.body.data).toHaveProperty('refreshToken');
+      expect(response.body.status).toBe("success");
+      expect(response.body.data).toHaveProperty("authToken");
+      expect(response.body.data).toHaveProperty("refreshToken");
       expect(response.body.data.email).toBe(userData.email);
     });
 
-    test('should reject duplicate email', async () => {
+    test("should reject duplicate email", async () => {
       // Create user first
-      await createTestUser({ email: 'existing@example.com' });
+      await createTestUser({ email: "existing@example.com" });
 
-      const response = await request(app)
-        .post('/api/auth/register')
-        .send({
-          name: 'Test User',
-          email: 'existing@example.com',
-          password: 'Password123!'
-        });
+      const response = await request(app).post("/api/auth/register").send({
+        name: "Test User",
+        email: "existing@example.com",
+        password: "Password123!",
+      });
 
       expect(response.status).toBe(400);
-      expect(response.body.status).toBe('error');
+      expect(response.body.status).toBe("error");
     });
 
-    test('should validate password requirements', async () => {
-      const response = await request(app)
-        .post('/api/auth/register')
-        .send({
-          name: 'Test User',
-          email: 'test@example.com',
-          password: 'weak'
-        });
+    test("should validate password requirements", async () => {
+      const response = await request(app).post("/api/auth/register").send({
+        name: "Test User",
+        email: "test@example.com",
+        password: "weak",
+      });
 
       expect(response.status).toBe(400);
-      expect(response.body.status).toBe('error');
+      expect(response.body.status).toBe("error");
     });
   });
 
-  describe('POST /api/auth/login', () => {
-    test('should login with valid credentials', async () => {
+  describe("POST /api/auth/login", () => {
+    test("should login with valid credentials", async () => {
       const user = await createTestUser();
 
-      const response = await request(app)
-        .post('/api/auth/login')
-        .send({
-          email: user.email,
-          password: 'Password123!'
-        });
+      const response = await request(app).post("/api/auth/login").send({
+        email: user.email,
+        password: "Password123!",
+      });
 
       expect(response.status).toBe(200);
-      expect(response.body.data).toHaveProperty('authToken');
-      expect(response.body.data).toHaveProperty('refreshToken');
+      expect(response.body.data).toHaveProperty("authToken");
+      expect(response.body.data).toHaveProperty("refreshToken");
     });
 
-    test('should reject invalid credentials', async () => {
-      const response = await request(app)
-        .post('/api/auth/login')
-        .send({
-          email: 'nonexistent@example.com',
-          password: 'wrongpassword'
-        });
+    test("should reject invalid credentials", async () => {
+      const response = await request(app).post("/api/auth/login").send({
+        email: "nonexistent@example.com",
+        password: "wrongpassword",
+      });
 
       expect(response.status).toBe(401);
-      expect(response.body.status).toBe('error');
+      expect(response.body.status).toBe("error");
     });
   });
 
-  describe('POST /api/auth/refresh', () => {
-    test('should refresh tokens successfully', async () => {
+  describe("POST /api/auth/refresh", () => {
+    test("should refresh tokens successfully", async () => {
       // Register user to get refresh token
       const registerResponse = await request(app)
-        .post('/api/auth/register')
+        .post("/api/auth/register")
         .send({
-          name: 'Test User',
-          email: 'test@example.com',
-          password: 'Password123!'
+          name: "Test User",
+          email: "test@example.com",
+          password: "Password123!",
         });
 
       const { refreshToken } = registerResponse.body.data;
 
       const response = await request(app)
-        .post('/api/auth/refresh')
+        .post("/api/auth/refresh")
         .send({ refreshToken });
 
       expect(response.status).toBe(200);
-      expect(response.body.data).toHaveProperty('authToken');
-      expect(response.body.data).toHaveProperty('refreshToken');
+      expect(response.body.data).toHaveProperty("authToken");
+      expect(response.body.data).toHaveProperty("refreshToken");
     });
   });
 });
@@ -298,12 +295,12 @@ describe('Authentication', () => {
 
 ```javascript
 // tests/graphql/queries.test.js
-import request from 'supertest';
-import app from '../../src/index.js';
+import request from "supertest";
+import app from "../../src/index.js";
 
-describe('GraphQL Queries', () => {
-  describe('me query', () => {
-    test('should return current user profile', async () => {
+describe("GraphQL Queries", () => {
+  describe("me query", () => {
+    test("should return current user profile", async () => {
       const user = await createTestUser();
       const { accessToken } = generateTokens(user);
 
@@ -319,8 +316,8 @@ describe('GraphQL Queries', () => {
       `;
 
       const response = await request(app)
-        .post('/graphql')
-        .set('Authorization', `Bearer ${accessToken}`)
+        .post("/graphql")
+        .set("Authorization", `Bearer ${accessToken}`)
         .send({ query });
 
       expect(response.status).toBe(200);
@@ -328,11 +325,11 @@ describe('GraphQL Queries', () => {
         id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
       });
     });
 
-    test('should require authentication', async () => {
+    test("should require authentication", async () => {
       const query = `
         query {
           me {
@@ -342,25 +339,25 @@ describe('GraphQL Queries', () => {
         }
       `;
 
-      const response = await request(app)
-        .post('/graphql')
-        .send({ query });
+      const response = await request(app).post("/graphql").send({ query });
 
-      expect(response.body.errors[0].message).toMatch(/authentication required/i);
+      expect(response.body.errors[0].message).toMatch(
+        /authentication required/i
+      );
     });
   });
 
-  describe('users query', () => {
-    test('should return all users for admin', async () => {
-      const adminUser = await createTestUser({ 
-        email: 'admin@example.com',
-        role: 'ADMIN' 
+  describe("users query", () => {
+    test("should return all users for admin", async () => {
+      const adminUser = await createTestUser({
+        email: "admin@example.com",
+        role: "ADMIN",
       });
       const { accessToken } = generateTokens(adminUser);
 
       // Create additional test users
-      await createTestUser({ email: 'user1@example.com' });
-      await createTestUser({ email: 'user2@example.com' });
+      await createTestUser({ email: "user1@example.com" });
+      await createTestUser({ email: "user2@example.com" });
 
       const query = `
         query {
@@ -373,16 +370,16 @@ describe('GraphQL Queries', () => {
       `;
 
       const response = await request(app)
-        .post('/graphql')
-        .set('Authorization', `Bearer ${accessToken}`)
+        .post("/graphql")
+        .set("Authorization", `Bearer ${accessToken}`)
         .send({ query });
 
       expect(response.status).toBe(200);
       expect(response.body.data.users).toHaveLength(3);
     });
 
-    test('should reject non-admin users', async () => {
-      const user = await createTestUser({ role: 'USER' });
+    test("should reject non-admin users", async () => {
+      const user = await createTestUser({ role: "USER" });
       const { accessToken } = generateTokens(user);
 
       const query = `
@@ -395,8 +392,8 @@ describe('GraphQL Queries', () => {
       `;
 
       const response = await request(app)
-        .post('/graphql')
-        .set('Authorization', `Bearer ${accessToken}`)
+        .post("/graphql")
+        .set("Authorization", `Bearer ${accessToken}`)
         .send({ query });
 
       expect(response.body.errors[0].message).toMatch(/admin access required/i);
@@ -409,12 +406,12 @@ describe('GraphQL Queries', () => {
 
 ```javascript
 // tests/graphql/mutations.test.js
-import request from 'supertest';
-import app from '../../src/index.js';
+import request from "supertest";
+import app from "../../src/index.js";
 
-describe('GraphQL Mutations', () => {
-  describe('register mutation', () => {
-    test('should register user successfully', async () => {
+describe("GraphQL Mutations", () => {
+  describe("register mutation", () => {
+    test("should register user successfully", async () => {
       const mutation = `
         mutation RegisterUser($input: RegisterInput!) {
           register(input: $input) {
@@ -433,24 +430,24 @@ describe('GraphQL Mutations', () => {
 
       const variables = {
         input: {
-          name: 'Test User',
-          email: 'test@example.com',
-          password: 'Password123!'
-        }
+          name: "Test User",
+          email: "test@example.com",
+          password: "Password123!",
+        },
       };
 
       const response = await request(app)
-        .post('/graphql')
+        .post("/graphql")
         .send({ query: mutation, variables });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.register.status).toBe('success');
+      expect(response.body.data.register.status).toBe("success");
       expect(response.body.data.register.data.authToken).toBeDefined();
     });
   });
 
-  describe('updateUser mutation', () => {
-    test('should update user profile', async () => {
+  describe("updateUser mutation", () => {
+    test("should update user profile", async () => {
       const user = await createTestUser();
       const { accessToken } = generateTokens(user);
 
@@ -469,17 +466,17 @@ describe('GraphQL Mutations', () => {
 
       const variables = {
         input: {
-          name: 'Updated Name'
-        }
+          name: "Updated Name",
+        },
       };
 
       const response = await request(app)
-        .post('/graphql')
-        .set('Authorization', `Bearer ${accessToken}`)
+        .post("/graphql")
+        .set("Authorization", `Bearer ${accessToken}`)
         .send({ query: mutation, variables });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.updateUser.data.name).toBe('Updated Name');
+      expect(response.body.data.updateUser.data.name).toBe("Updated Name");
     });
   });
 });
@@ -489,19 +486,19 @@ describe('GraphQL Mutations', () => {
 
 ```javascript
 // tests/graphql/subscriptions.test.js
-import { createClient } from 'graphql-ws';
-import WebSocket from 'ws';
+import { createClient } from "graphql-ws";
+import WebSocket from "ws";
 
-describe('GraphQL Subscriptions', () => {
+describe("GraphQL Subscriptions", () => {
   let client;
 
   beforeEach(() => {
     client = createClient({
-      url: 'ws://localhost:4000/graphql',
+      url: "ws://localhost:4000/graphql",
       webSocketImpl: WebSocket,
       connectionParams: {
         // Add auth token if needed
-      }
+      },
     });
   });
 
@@ -509,7 +506,7 @@ describe('GraphQL Subscriptions', () => {
     client.dispose();
   });
 
-  test('should receive subscription events', (done) => {
+  test("should receive subscription events", (done) => {
     const subscription = client.iterate({
       query: `
         subscription {
@@ -519,14 +516,14 @@ describe('GraphQL Subscriptions', () => {
             timestamp
           }
         }
-      `
+      `,
     });
 
     // Listen for events
     (async () => {
       for await (const result of subscription) {
         expect(result.data.testSubscription).toBeDefined();
-        expect(result.data.testSubscription.message).toBe('Test message');
+        expect(result.data.testSubscription.message).toBe("Test message");
         done();
         break;
       }
@@ -535,7 +532,7 @@ describe('GraphQL Subscriptions', () => {
     // Trigger event after short delay
     setTimeout(async () => {
       await request(app)
-        .post('/graphql')
+        .post("/graphql")
         .send({
           query: `
             mutation {
@@ -543,7 +540,7 @@ describe('GraphQL Subscriptions', () => {
                 id
               }
             }
-          `
+          `,
         });
     }, 100);
   });
@@ -554,10 +551,10 @@ describe('GraphQL Subscriptions', () => {
 
 ```javascript
 // tests/rest/users.test.js
-import request from 'supertest';
-import app from '../../src/index.js';
+import request from "supertest";
+import app from "../../src/index.js";
 
-describe('User REST Endpoints', () => {
+describe("User REST Endpoints", () => {
   let authToken;
   let testUser;
 
@@ -567,37 +564,36 @@ describe('User REST Endpoints', () => {
     authToken = tokens.accessToken;
   });
 
-  describe('GET /api/users/profile', () => {
-    test('should return user profile', async () => {
+  describe("GET /api/users/profile", () => {
+    test("should return user profile", async () => {
       const response = await request(app)
-        .get('/api/users/profile')
-        .set('Authorization', `Bearer ${authToken}`);
+        .get("/api/users/profile")
+        .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
       expect(response.body.data.email).toBe(testUser.email);
     });
 
-    test('should require authentication', async () => {
-      const response = await request(app)
-        .get('/api/users/profile');
+    test("should require authentication", async () => {
+      const response = await request(app).get("/api/users/profile");
 
       expect(response.status).toBe(401);
     });
   });
 
-  describe('PUT /api/users/profile', () => {
-    test('should update user profile', async () => {
+  describe("PUT /api/users/profile", () => {
+    test("should update user profile", async () => {
       const updateData = {
-        name: 'Updated Name'
+        name: "Updated Name",
       };
 
       const response = await request(app)
-        .put('/api/users/profile')
-        .set('Authorization', `Bearer ${authToken}`)
+        .put("/api/users/profile")
+        .set("Authorization", `Bearer ${authToken}`)
         .send(updateData);
 
       expect(response.status).toBe(200);
-      expect(response.body.data.name).toBe('Updated Name');
+      expect(response.body.data.name).toBe("Updated Name");
     });
   });
 });
@@ -607,18 +603,18 @@ describe('User REST Endpoints', () => {
 
 ```javascript
 // tests/utils/email.test.js
-import { sendEmail, sendWelcomeEmail } from '../../src/email/index.js';
-import nodemailer from 'nodemailer';
+import { sendEmail, sendWelcomeEmail } from "../../src/email/index.js";
+import nodemailer from "nodemailer";
 
 // Mock nodemailer
-jest.mock('nodemailer');
+jest.mock("nodemailer");
 
-describe('Email Service', () => {
+describe("Email Service", () => {
   let mockTransporter;
 
   beforeEach(() => {
     mockTransporter = {
-      sendMail: jest.fn().mockResolvedValue({ messageId: 'test-id' })
+      sendMail: jest.fn().mockResolvedValue({ messageId: "test-id" }),
     };
     nodemailer.createTransport.mockReturnValue(mockTransporter);
   });
@@ -627,10 +623,10 @@ describe('Email Service', () => {
     jest.clearAllMocks();
   });
 
-  test('should send welcome email', async () => {
+  test("should send welcome email", async () => {
     const user = {
-      name: 'Test User',
-      email: 'test@example.com'
+      name: "Test User",
+      email: "test@example.com",
     };
 
     await sendWelcomeEmail(user);
@@ -638,20 +634,20 @@ describe('Email Service', () => {
     expect(mockTransporter.sendMail).toHaveBeenCalledWith(
       expect.objectContaining({
         to: user.email,
-        subject: expect.stringContaining('Welcome')
+        subject: expect.stringContaining("Welcome"),
       })
     );
   });
 
-  test('should handle email sending errors', async () => {
-    mockTransporter.sendMail.mockRejectedValue(new Error('SMTP Error'));
+  test("should handle email sending errors", async () => {
+    mockTransporter.sendMail.mockRejectedValue(new Error("SMTP Error"));
 
     const user = {
-      name: 'Test User',
-      email: 'test@example.com'
+      name: "Test User",
+      email: "test@example.com",
     };
 
-    await expect(sendWelcomeEmail(user)).rejects.toThrow('SMTP Error');
+    await expect(sendWelcomeEmail(user)).rejects.toThrow("SMTP Error");
   });
 });
 ```
@@ -660,27 +656,27 @@ describe('Email Service', () => {
 
 ```javascript
 // tests/performance/load.test.js
-import request from 'supertest';
-import app from '../../src/index.js';
+import request from "supertest";
+import app from "../../src/index.js";
 
-describe('Performance Tests', () => {
-  test('should handle concurrent requests', async () => {
-    const requests = Array(50).fill().map(() =>
-      request(app).get('/api/health')
-    );
+describe("Performance Tests", () => {
+  test("should handle concurrent requests", async () => {
+    const requests = Array(50)
+      .fill()
+      .map(() => request(app).get("/api/health"));
 
     const responses = await Promise.all(requests);
-    
-    responses.forEach(response => {
+
+    responses.forEach((response) => {
       expect(response.status).toBe(200);
     });
   });
 
-  test('should respond within acceptable time', async () => {
+  test("should respond within acceptable time", async () => {
     const start = Date.now();
-    
-    await request(app).get('/api/health');
-    
+
+    await request(app).get("/api/health");
+
     const duration = Date.now() - start;
     expect(duration).toBeLessThan(100); // 100ms
   });
@@ -734,7 +730,7 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     services:
       postgres:
         image: postgres:14
@@ -748,21 +744,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
-          cache: 'npm'
-          
+          node-version: "18"
+          cache: "npm"
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Run tests
         run: npm test
         env:
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
-          
+
       - name: Upload coverage
         uses: codecov/codecov-action@v3
 ```
@@ -770,24 +766,28 @@ jobs:
 ## Best Practices
 
 ### Test Organization
+
 - Group related tests in describe blocks
 - Use descriptive test names
 - Follow AAA pattern (Arrange, Act, Assert)
 - Keep tests independent and isolated
 
 ### Database Testing
+
 - Use separate test database
 - Clean data between tests
 - Use transactions for isolation
 - Mock external services
 
 ### Authentication Testing
+
 - Test both positive and negative cases
 - Verify token expiration handling
 - Test role-based access control
 - Mock JWT in unit tests
 
 ### Performance Testing
+
 - Set reasonable response time expectations
 - Test concurrent request handling
 - Monitor memory usage
@@ -798,6 +798,7 @@ jobs:
 ### Common Issues
 
 **Database Connection Errors**
+
 ```bash
 # Ensure test database exists
 createdb express_apollo_test
@@ -807,22 +808,24 @@ DATABASE_URL="postgresql://localhost:5432/express_apollo_test" npx prisma migrat
 ```
 
 **Token Expiry in Tests**
+
 ```javascript
 // Use longer-lived tokens for testing
 const generateTestToken = (user) => {
   return jwt.sign(
     { userId: user.id, email: user.email, role: user.role },
     process.env.JWT_SECRET,
-    { expiresIn: '1h' } // Longer expiry for tests
+    { expiresIn: "1h" } // Longer expiry for tests
   );
 };
 ```
 
 **WebSocket Connection Issues**
+
 ```javascript
 // Ensure server is running before WebSocket tests
 beforeAll(async () => {
-  await new Promise(resolve => {
+  await new Promise((resolve) => {
     server.listen(0, resolve);
   });
 });

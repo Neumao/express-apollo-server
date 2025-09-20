@@ -5,6 +5,7 @@ Complete reference for all GraphQL types, queries, mutations, and subscriptions.
 ## Schema Overview
 
 The GraphQL schema is organized into domains:
+
 - **User Domain**: Authentication, user management
 - **Base Domain**: Core functionality, testing, utilities
 
@@ -25,6 +26,7 @@ type User {
 ```
 
 **Fields:**
+
 - `id`: Unique user identifier (CUID)
 - `name`: User's full name
 - `email`: Unique email address
@@ -44,6 +46,7 @@ enum Role {
 ```
 
 **Values:**
+
 - `USER`: Standard user permissions
 - `ADMIN`: Full system access
 - `MODERATOR`: Limited administrative access
@@ -114,6 +117,7 @@ input RegisterInput {
 ```
 
 **Validation:**
+
 - `name`: 2-50 characters
 - `email`: Valid email format, unique
 - `password`: Minimum 8 characters, must include uppercase, lowercase, number, and special character
@@ -137,6 +141,7 @@ input UpdateUserInput {
 ```
 
 **Notes:**
+
 - All fields optional
 - Email must be unique if provided
 - Password updates handled separately for security
@@ -162,7 +167,8 @@ query GetCurrentUser {
 
 **Returns:** `User`  
 **Auth Required:** Yes  
-**Errors:** 
+**Errors:**
+
 - `Authentication required` - No valid token provided
 
 ### user
@@ -183,11 +189,13 @@ query GetUser($id: ID!) {
 ```
 
 **Args:**
+
 - `id` (ID!): User identifier
 
 **Returns:** `User`  
 **Auth Required:** Yes (Admin role)  
 **Errors:**
+
 - `Authentication required` - No valid token
 - `Admin access required` - Insufficient permissions
 - `User not found` - Invalid user ID
@@ -212,6 +220,7 @@ query GetAllUsers {
 **Returns:** `[User]`  
 **Auth Required:** Yes (Admin role)  
 **Errors:**
+
 - `Authentication required` - No valid token
 - `Admin access required` - Insufficient permissions
 
@@ -252,23 +261,28 @@ mutation RegisterUser($input: RegisterInput!) {
 ```
 
 **Args:**
+
 - `input` (RegisterInput!): User registration data
 
 **Returns:** `AuthResponse`  
 **Auth Required:** No  
 **Side Effects:**
+
 - Creates user in database
 - Sends welcome email
 - Generates auth tokens
 
 **Example:**
+
 ```graphql
 mutation {
-  register(input: {
-    name: "John Doe"
-    email: "john@example.com"
-    password: "SecurePass123!"
-  }) {
+  register(
+    input: {
+      name: "John Doe"
+      email: "john@example.com"
+      password: "SecurePass123!"
+    }
+  ) {
     status
     message
     data {
@@ -302,15 +316,18 @@ mutation LoginUser($input: LoginInput!) {
 ```
 
 **Args:**
+
 - `input` (LoginInput!): Login credentials
 
 **Returns:** `AuthResponse`  
 **Auth Required:** No  
 **Side Effects:**
+
 - Updates last login timestamp
 - Generates new auth tokens
 
 **Errors:**
+
 - `Invalid credentials` - Wrong email/password
 - `User not found` - Email doesn't exist
 
@@ -330,6 +347,7 @@ mutation LogoutUser {
 **Returns:** `ApiResponse`  
 **Auth Required:** Yes  
 **Side Effects:**
+
 - Invalidates refresh token
 - Logs logout event
 
@@ -353,15 +371,18 @@ mutation UpdateProfile($input: UpdateUserInput!) {
 ```
 
 **Args:**
+
 - `input` (UpdateUserInput!): Updated user data
 
 **Returns:** `ApiResponse`  
 **Auth Required:** Yes  
 **Side Effects:**
+
 - Updates user record
 - Updates timestamp
 
 **Errors:**
+
 - `Authentication required` - No valid token
 - `Email already exists` - Duplicate email
 - `User not found` - Invalid user ID
@@ -382,6 +403,7 @@ mutation DeleteAccount {
 **Returns:** `ApiResponse`  
 **Auth Required:** Yes  
 **Side Effects:**
+
 - Soft deletes user record
 - Invalidates all tokens
 - Sends deletion confirmation email
@@ -404,15 +426,18 @@ mutation RefreshAccessToken($refreshToken: String!) {
 ```
 
 **Args:**
+
 - `refreshToken` (String!): Valid refresh token
 
 **Returns:** `AuthResponse`  
 **Auth Required:** No (uses refresh token)  
 **Side Effects:**
+
 - Generates new token pair
 - Invalidates old refresh token
 
 **Errors:**
+
 - `Invalid refresh token` - Token doesn't exist
 - `Refresh token expired` - Token past expiry
 - `User not found` - Associated user deleted
@@ -432,11 +457,13 @@ mutation TriggerTest($message: String!) {
 ```
 
 **Args:**
+
 - `message` (String!): Custom message for the event
 
 **Returns:** `TestPayload`  
 **Auth Required:** No  
 **Side Effects:**
+
 - Publishes event to all `testSubscription` subscribers
 
 ## Subscriptions
@@ -460,6 +487,7 @@ subscription TestEvents {
 **Trigger:** `triggerTestSubscription` mutation
 
 **Example Usage:**
+
 ```javascript
 // Client-side subscription
 const { data, loading, error } = useSubscription(gql`
@@ -512,16 +540,16 @@ const [trigger] = useMutation(gql`
 
 ### Common Error Codes
 
-| Code | Description | Resolution |
-|------|-------------|------------|
-| `UNAUTHENTICATED` | No authentication provided | Include valid JWT token |
-| `FORBIDDEN` | Insufficient permissions | Check user role requirements |
-| `BAD_USER_INPUT` | Invalid input data | Validate input format |
-| `USER_NOT_FOUND` | User doesn't exist | Verify user ID |
-| `EMAIL_EXISTS` | Email already registered | Use different email |
-| `INVALID_CREDENTIALS` | Wrong login details | Check email/password |
-| `TOKEN_EXPIRED` | Access token expired | Use refresh token |
-| `INTERNAL_ERROR` | Server error | Check server logs |
+| Code                  | Description                | Resolution                   |
+| --------------------- | -------------------------- | ---------------------------- |
+| `UNAUTHENTICATED`     | No authentication provided | Include valid JWT token      |
+| `FORBIDDEN`           | Insufficient permissions   | Check user role requirements |
+| `BAD_USER_INPUT`      | Invalid input data         | Validate input format        |
+| `USER_NOT_FOUND`      | User doesn't exist         | Verify user ID               |
+| `EMAIL_EXISTS`        | Email already registered   | Use different email          |
+| `INVALID_CREDENTIALS` | Wrong login details        | Check email/password         |
+| `TOKEN_EXPIRED`       | Access token expired       | Use refresh token            |
+| `INTERNAL_ERROR`      | Server error               | Check server logs            |
 
 ## Rate Limiting
 
@@ -555,11 +583,13 @@ query GetSchema {
 ```graphql
 # 1. Register
 mutation Register {
-  register(input: {
-    name: "Alice Smith"
-    email: "alice@example.com"
-    password: "SecurePass123!"
-  }) {
+  register(
+    input: {
+      name: "Alice Smith"
+      email: "alice@example.com"
+      password: "SecurePass123!"
+    }
+  ) {
     status
     data {
       id
@@ -581,9 +611,7 @@ query Profile {
 
 # 3. Update profile
 mutation Update {
-  updateUser(input: {
-    name: "Alice Johnson"
-  }) {
+  updateUser(input: { name: "Alice Johnson" }) {
     status
     data {
       name

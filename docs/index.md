@@ -20,17 +20,17 @@
 
 ## 🎯 Tech Stack
 
-| Category | Technology |
-|----------|------------|
-| **Backend** | Node.js, Express.js |
-| **GraphQL** | Apollo Server v5, graphql-ws |
-| **Database** | PostgreSQL, Prisma ORM |
-| **Authentication** | JWT, bcrypt |
-| **Real-time** | WebSocket Subscriptions |
-| **Email** | Nodemailer, Handlebars |
-| **Logging** | Winston |
-| **Testing** | Jest |
-| **Documentation** | VitePress |
+| Category           | Technology                   |
+| ------------------ | ---------------------------- |
+| **Backend**        | Node.js, Express.js          |
+| **GraphQL**        | Apollo Server v5, graphql-ws |
+| **Database**       | PostgreSQL, Prisma ORM       |
+| **Authentication** | JWT, bcrypt                  |
+| **Real-time**      | WebSocket Subscriptions      |
+| **Email**          | Nodemailer, Handlebars       |
+| **Logging**        | Winston                      |
+| **Testing**        | Jest                         |
+| **Documentation**  | VitePress                    |
 
 ## 🏗️ Architecture
 
@@ -55,16 +55,19 @@ src/
 ## 📚 Quick Links
 
 ### 🔧 Development
+
 - [**Getting Started**](/guides/) - Set up your development environment
 - [**Authentication Guide**](/guides/authentication) - JWT implementation details
 - [**Testing Guide**](/guides/testing) - Running tests and examples
 
-### 📖 API Reference  
+### 📖 API Reference
+
 - [**GraphQL API**](/api/graphql/schema) - Complete GraphQL schema documentation
 - [**REST API**](/api/rest/authentication) - Express.js endpoints
 - [**Subscriptions**](/api/graphql/subscriptions) - Real-time features
 
 ### 🏛️ Architecture
+
 - [**Domain Structure**](/architecture/domain-structure) - How code is organized
 - [**Database Schema**](/architecture/database) - Prisma models and relationships
 - [**Security**](/architecture/security) - Authentication and authorization
@@ -96,13 +99,13 @@ npm run dev
 
 ## 📊 API Endpoints
 
-| Type | Endpoint | Description |
-|------|----------|-------------|
-| GraphQL | `/graphql` | Main GraphQL endpoint |
-| WebSocket | `/graphql` | GraphQL subscriptions |
-| REST | `/api/auth/*` | Authentication endpoints |
-| REST | `/api/users/*` | User management |
-| REST | `/api/analytics` | API metrics dashboard |
+| Type      | Endpoint         | Description              |
+| --------- | ---------------- | ------------------------ |
+| GraphQL   | `/graphql`       | Main GraphQL endpoint    |
+| WebSocket | `/graphql`       | GraphQL subscriptions    |
+| REST      | `/api/auth/*`    | Authentication endpoints |
+| REST      | `/api/users/*`   | User management          |
+| REST      | `/api/analytics` | API metrics dashboard    |
 
 ## 🔐 Authentication Flow
 

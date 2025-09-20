@@ -9,15 +9,19 @@ The codebase follows a **domain-driven design** approach, organizing code by bus
 ## Architecture Principles
 
 ### 1. Domain Separation
+
 Code is organized by business domains (User, Product, Order, etc.) rather than by technical layers (controllers, services, models).
 
 ### 2. Clear Boundaries
+
 Each domain has well-defined boundaries and responsibilities, minimizing cross-domain dependencies.
 
 ### 3. Scalable Structure
+
 New features can be added by extending existing domains or creating new ones without affecting other parts of the system.
 
 ### 4. Team Ownership
+
 Different teams can own different domains, enabling parallel development and clear ownership.
 
 ## Current Domain Structure
@@ -46,12 +50,14 @@ src/
 **Purpose**: Handles all user-related functionality including authentication, profile management, and user operations.
 
 **Responsibilities:**
+
 - User registration and authentication
 - Profile management (view, update, delete)
 - User listing and retrieval (admin functions)
 - JWT token management
 
 **Resolvers:**
+
 - **Queries**: `me`, `user`, `users`
 - **Mutations**: `register`, `login`, `logout`, `updateUser`, `deleteUser`, `refreshToken`
 - **Subscriptions**: None currently (planned: user events)
@@ -61,12 +67,14 @@ src/
 **Purpose**: Provides core functionality, utilities, and features that don't belong to specific business domains.
 
 **Responsibilities:**
+
 - Health checks and testing utilities
 - System-wide events and notifications
 - Cross-domain functionality
 - Development and debugging tools
 
 **Resolvers:**
+
 - **Queries**: `hello`
 - **Mutations**: `triggerTestSubscription`
 - **Subscriptions**: `testSubscription`
@@ -77,9 +85,9 @@ src/
 
 ```javascript
 // graphql/resolvers/index.js
-import userResolvers from './user/index.js';
-import baseResolvers from './base/index.js';
-import typeResolvers from './typeResolvers.js';
+import userResolvers from "./user/index.js";
+import baseResolvers from "./base/index.js";
+import typeResolvers from "./typeResolvers.js";
 
 const resolvers = {
   Query: {
@@ -106,8 +114,8 @@ Each domain has an `index.js` file that exports all resolvers for that domain:
 
 ```javascript
 // graphql/resolvers/user/index.js
-import * as queries from './queries.js';
-import * as mutations from './mutations.js';
+import * as queries from "./queries.js";
+import * as mutations from "./mutations.js";
 
 export default {
   Query: queries,
@@ -122,38 +130,38 @@ Within each domain, resolvers are organized by GraphQL operation type:
 
 ```javascript
 // graphql/resolvers/user/queries.js
-import { prisma } from '../../../prisma/client.js';
+import { prisma } from "../../../prisma/client.js";
 
 export const me = async (parent, args, context) => {
   if (!context.user) {
-    throw new Error('Authentication required');
+    throw new Error("Authentication required");
   }
   return context.user;
 };
 
 export const user = async (parent, { id }, context) => {
-  if (!context.user || context.user.role !== 'ADMIN') {
-    throw new Error('Admin access required');
+  if (!context.user || context.user.role !== "ADMIN") {
+    throw new Error("Admin access required");
   }
-  
+
   const user = await prisma.user.findUnique({
-    where: { id }
+    where: { id },
   });
-  
+
   if (!user) {
-    throw new Error('User not found');
+    throw new Error("User not found");
   }
-  
+
   return user;
 };
 
 export const users = async (parent, args, context) => {
-  if (!context.user || context.user.role !== 'ADMIN') {
-    throw new Error('Admin access required');
+  if (!context.user || context.user.role !== "ADMIN") {
+    throw new Error("Admin access required");
   }
-  
+
   return await prisma.user.findMany({
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: "desc" },
   });
 };
 ```
@@ -189,6 +197,7 @@ export const users = async (parent, args, context) => {
 The project was migrated from a type-based structure to domain-based:
 
 ### Before (Type-Based)
+
 ```
 resolvers/
 ├── queries.js      # All queries mixed together
@@ -197,6 +206,7 @@ resolvers/
 ```
 
 ### After (Domain-Based)
+
 ```
 resolvers/
 ├── user/
@@ -251,8 +261,8 @@ export const updateProduct = async (parent, { id, input }, context) => {
 
 ```javascript
 // src/graphql/resolvers/product/index.js
-import * as queries from './queries.js';
-import * as mutations from './mutations.js';
+import * as queries from "./queries.js";
+import * as mutations from "./mutations.js";
 
 export default {
   Query: queries,
@@ -265,7 +275,7 @@ export default {
 
 ```javascript
 // src/graphql/resolvers/index.js
-import productResolvers from './product/index.js';
+import productResolvers from "./product/index.js";
 
 const resolvers = {
   Query: {

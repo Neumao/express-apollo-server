@@ -17,36 +17,43 @@
 ## ✨ Features
 
 🔥 **Modern GraphQL Server**
+
 - Apollo Server v5 with native subscriptions
 - Real-time WebSocket communication
 - Automatic schema validation and introspection
 
 🛡️ **Robust Authentication**
+
 - JWT with automatic refresh tokens (15min/7day cycle)
-- WebSocket authentication for subscriptions  
+- WebSocket authentication for subscriptions
 - Role-based access control (USER/ADMIN/MODERATOR)
 
 ⚡ **High-Performance REST API**
+
 - Express.js with comprehensive middleware
 - Rate limiting and CORS protection
 - Built-in analytics dashboard
 
 🗄️ **Type-Safe Database**
+
 - Prisma ORM with PostgreSQL
 - Automatic migrations and schema validation
 - Optimized queries with relation loading
 
 🏗️ **Domain-Driven Architecture**
+
 - Organized by business domains (user/, base/)
 - Scalable resolver structure
 - Clear separation of concerns
 
 📧 **Email System**
+
 - Handlebars templates (welcome, password reset)
 - SMTP configuration with fallback
 - Automated notification workflows
 
 📊 **Production Features**
+
 - Winston logging with file rotation
 - Comprehensive error handling
 - Health checks and monitoring
@@ -61,7 +68,7 @@ cd express-apollo-server && npm install && cp .env.example .env
 npx prisma migrate dev && npm run dev
 
 # ✅ Server running at http://localhost:4000
-# 🎮 GraphQL Playground: http://localhost:4000/graphql  
+# 🎮 GraphQL Playground: http://localhost:4000/graphql
 # 📊 Analytics Dashboard: http://localhost:4000/api/analytics
 ```
 
@@ -71,23 +78,23 @@ npx prisma migrate dev && npm run dev
 graph TB
     Client[Client Apps] --> LB[Load Balancer]
     LB --> Server[Express + Apollo Server]
-    
+
     Server --> GraphQL[GraphQL Endpoint<br/>/graphql]
     Server --> REST[REST API<br/>/api/*]
     Server --> WS[WebSocket<br/>Subscriptions]
-    
+
     GraphQL --> Auth[JWT Auth<br/>Middleware]
     REST --> Auth
     WS --> Auth
-    
+
     Auth --> Resolvers[Domain Resolvers]
     Resolvers --> User[User Domain<br/>auth, profile]
     Resolvers --> Base[Base Domain<br/>core, testing]
-    
+
     User --> Prisma[Prisma ORM]
     Base --> Prisma
     Prisma --> DB[(PostgreSQL<br/>Database)]
-    
+
     Server --> Email[Email Service<br/>SMTP + Templates]
     Server --> Logs[Winston Logging<br/>Files + Console]
 ```
@@ -99,7 +106,7 @@ src/
 ├── 🎯 index.js                 # Application entry point
 ├── ⚙️ config/                  # Configuration & environment
 ├── 🌐 express/                 # REST API layer
-│   ├── 🎮 controllers/         # Route handlers  
+│   ├── 🎮 controllers/         # Route handlers
 │   ├── 🛡️ middleware/          # Auth, logging, errors
 │   ├── 🛣️ routes/              # API endpoints
 │   └── 🔧 services/            # Business logic
@@ -119,7 +126,7 @@ src/
 ### 📋 Prerequisites
 
 - **Node.js 18+** (LTS recommended)
-- **PostgreSQL 14+**  
+- **PostgreSQL 14+**
 - **npm/yarn**
 
 ### ⚡ Installation
@@ -129,7 +136,7 @@ src/
 git clone https://github.com/Neumao/express-apollo-server.git
 cd express-apollo-server
 
-# 2️⃣ Install dependencies  
+# 2️⃣ Install dependencies
 npm install
 
 # 3️⃣ Environment setup
@@ -147,6 +154,7 @@ npm run dev
 ### 🎮 Try It Out
 
 **REST API Example:**
+
 ```bash
 # Register user
 curl -X POST http://localhost:4000/api/auth/register \
@@ -155,14 +163,17 @@ curl -X POST http://localhost:4000/api/auth/register \
 ```
 
 **GraphQL Example:**
+
 ```graphql
 # In Apollo Playground (http://localhost:4000/graphql)
 mutation {
-  register(input: {
-    name: "Jane Smith"
-    email: "jane@example.com" 
-    password: "SecurePass123!"
-  }) {
+  register(
+    input: {
+      name: "Jane Smith"
+      email: "jane@example.com"
+      password: "SecurePass123!"
+    }
+  ) {
     data {
       id
       name
@@ -173,6 +184,7 @@ mutation {
 ```
 
 **Real-time Subscriptions:**
+
 ```graphql
 # Subscribe to events
 subscription {
@@ -197,22 +209,22 @@ mutation {
 ```mermaid
 sequenceDiagram
     participant Client
-    participant Server  
+    participant Server
     participant DB
-    
+
     Client->>Server: 1. Register/Login
     Server->>DB: Verify credentials
     DB-->>Server: User data
     Server-->>Client: 2. Access Token (15min) + Refresh Token (7d)
-    
+
     Note over Client: Making authenticated requests
-    
+
     Client->>Server: 3. API Request + Token
     Server->>Server: Verify token
     Server-->>Client: 4. Protected data
-    
+
     Note over Client: Token expires
-    
+
     Client->>Server: 5. Request with expired token
     Server-->>Client: 6. 401 Unauthorized
     Client->>Server: 7. Refresh token request
@@ -221,8 +233,9 @@ sequenceDiagram
 ```
 
 **Features:**
+
 - 🔑 **JWT Access Tokens** (15-minute expiry)
-- 🔄 **Automatic Refresh** (7-day refresh tokens)  
+- 🔄 **Automatic Refresh** (7-day refresh tokens)
 - 🌐 **WebSocket Auth** (Connection-level authentication)
 - 👥 **Role-Based Access** (USER/ADMIN/MODERATOR)
 
@@ -232,17 +245,18 @@ Built on **Apollo Server v5** native subscriptions with WebSocket authentication
 
 ```javascript
 // Client setup with authentication
-import { createClient } from 'graphql-ws';
+import { createClient } from "graphql-ws";
 
 const wsClient = createClient({
-  url: 'ws://localhost:4000/graphql',
+  url: "ws://localhost:4000/graphql",
   connectionParams: () => ({
-    authorization: `Bearer ${getToken()}`
-  })
+    authorization: `Bearer ${getToken()}`,
+  }),
 });
 ```
 
 **Available Subscriptions:**
+
 - 🧪 `testSubscription` - Development testing
 - 👤 `userUpdated` - User profile changes (planned)
 - 📢 `notifications` - Real-time notifications (planned)
@@ -274,13 +288,13 @@ npm run format          # ✨ Prettier code formatting
 # 🗄️ Database
 DATABASE_URL="postgresql://user:pass@localhost:5432/dbname"
 
-# 🔐 JWT Configuration  
+# 🔐 JWT Configuration
 JWT_SECRET="your-super-secret-jwt-key"
 JWT_REFRESH_SECRET="your-super-secret-refresh-key"
 
 # 📧 Email Configuration (Optional)
 SMTP_HOST="smtp.gmail.com"
-SMTP_PORT="587" 
+SMTP_PORT="587"
 SMTP_USER="your-email@gmail.com"
 SMTP_PASS="your-app-password"
 
@@ -293,25 +307,27 @@ NODE_ENV="development"
 
 ### 🌐 REST Endpoints
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| `POST` | `/api/auth/register` | User registration | ❌ |
-| `POST` | `/api/auth/login` | User login | ❌ | 
-| `POST` | `/api/auth/refresh` | Refresh tokens | ❌ |
-| `POST` | `/api/auth/logout` | User logout | ✅ |
-| `GET` | `/api/users/profile` | Get profile | ✅ |
-| `PUT` | `/api/users/profile` | Update profile | ✅ |
-| `GET` | `/api/analytics` | API dashboard | ❌ |
+| Method | Endpoint             | Description       | Auth |
+| ------ | -------------------- | ----------------- | ---- |
+| `POST` | `/api/auth/register` | User registration | ❌   |
+| `POST` | `/api/auth/login`    | User login        | ❌   |
+| `POST` | `/api/auth/refresh`  | Refresh tokens    | ❌   |
+| `POST` | `/api/auth/logout`   | User logout       | ✅   |
+| `GET`  | `/api/users/profile` | Get profile       | ✅   |
+| `PUT`  | `/api/users/profile` | Update profile    | ✅   |
+| `GET`  | `/api/analytics`     | API dashboard     | ❌   |
 
 ### 📡 GraphQL Operations
 
 **🔍 Queries:**
+
 - `me` - Current user profile
 - `user(id)` - Specific user (admin)
 - `users` - All users (admin)
 - `hello` - Health check
 
-**✏️ Mutations:**  
+**✏️ Mutations:**
+
 - `register(input)` - User registration
 - `login(input)` - Authentication
 - `logout` - End session
@@ -321,6 +337,7 @@ NODE_ENV="development"
 - `triggerTestSubscription(message)` - Test events
 
 **📡 Subscriptions:**
+
 - `testSubscription` - Real-time test events
 
 ## 🚀 Production Deployment
@@ -351,7 +368,7 @@ PORT=4000
 
 - **Hosting**: Railway, Vercel, AWS ECS
 - **Database**: Railway PostgreSQL, AWS RDS
-- **Monitoring**: DataDog, LogRocket  
+- **Monitoring**: DataDog, LogRocket
 - **CDN**: CloudFlare
 - **SSL**: Let's Encrypt
 
@@ -360,7 +377,7 @@ PORT=4000
 📖 **[Complete Documentation](https://express-apollo-server.netlify.app/)**
 
 - 🚀 [**Getting Started**](https://express-apollo-server.netlify.app/guides/) - Setup and development
-- 🔐 [**Authentication Guide**](https://express-apollo-server.netlify.app/guides/authentication) - JWT implementation  
+- 🔐 [**Authentication Guide**](https://express-apollo-server.netlify.app/guides/authentication) - JWT implementation
 - 📡 [**Subscriptions Guide**](https://express-apollo-server.netlify.app/guides/subscriptions) - Real-time features
 - 📖 [**GraphQL API**](https://express-apollo-server.netlify.app/api/graphql/schema) - Complete schema reference
 - 🏗️ [**Architecture**](https://express-apollo-server.netlify.app/architecture/domain-structure) - Domain structure guide
@@ -372,7 +389,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md).
 1. **Fork** the repository
 2. **Create** feature branch (`git checkout -b feature/amazing-feature`)
 3. **Commit** changes (`git commit -m 'Add amazing feature'`)
-4. **Push** to branch (`git push origin feature/amazing-feature`)  
+4. **Push** to branch (`git push origin feature/amazing-feature`)
 5. **Open** Pull Request
 
 ## 📄 License
