@@ -83,3 +83,45 @@ export const createContext = async ({ req, res }) => {
         return { user: null, res };
     }
 };
+
+/**
+ * Create subscription context
+ * Handles user authentication for WebSocket connections
+ * @param {Object} options - Context function options
+ * @returns {Object} - Context object
+ */
+export const createSubscriptionContext = async ({ _token, refreshToken }) => {
+    try {
+        const token = extractTokenFromHeader(_token)
+        if (!token && !refreshToken) {
+            throw new Error('Authentication token is required');
+        }
+
+        try {
+            const user = verifyToken(token);
+            logger.debug(`WebSocket connection authenticated for user: ${user.id}`);
+            return { user };
+        } catch (error) {
+            if (error.name === 'TokenExpiredError' && refreshToken) {
+                logger.warn('Access token expired, attempting to refresh');
+
+                try {
+                    const user = verifyToken(refreshToken, true); // Verify refresh token
+                    const newAccessToken = generateAccessToken(user);
+                    const newRefreshToken = generateRefreshToken(user);
+
+                    logger.info(`Refreshed tokens for user: ${user.id}`);
+                    return { user, newAccessToken, newRefreshToken };
+                } catch (refreshError) {
+                    logger.error(`Invalid refresh token: ${refreshError.message}`);
+                    return { user: null };
+                }
+            }
+            logger.error(`WebSocket connection error: ${error.message}`);
+            return { user: null };
+        }
+    } catch (error) {
+        logger.error(`Error in subscription context: ${error.message}`);
+        return { user: null };
+    }
+};

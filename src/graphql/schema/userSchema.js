@@ -82,9 +82,6 @@ const userSchema = `#graphql
 
   type Subscription {
     _: Boolean
-    userCreated: ResponsePayload!
-    userUpdated(id: ID!): ResponsePayload!
-    userDeleted: ResponsePayload!
   }
 `;
 
