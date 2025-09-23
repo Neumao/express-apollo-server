@@ -19,10 +19,13 @@ router.get('/metrics', AnalyticsController.getMetrics);
 // Get recent logs
 router.get('/logs', AnalyticsController.getLogs);
 
-// Get API usage statistics
-router.get('/usage', AnalyticsController.getApiUsage);
+// Get available log files info
+router.get('/logs/info', AnalyticsController.getLogFilesInfo);
+
+// Get user analytics
+router.get('/users', AnalyticsController.getUserAnalytics);
 
 // Render analytics dashboard
-router.get('/', AnalyticsController.renderDashboard);
+router.get('/', AnalyticsController.getDashboard);
 
 export default router;

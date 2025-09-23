@@ -1,22 +1,44 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import { engine } from 'express-handlebars';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { logger, config } from '../config/index.js';
 import {
     loggingMiddleware,
     errorMiddleware,
     // rateLimitMiddleware
 } from './middleware/index.js';
+import { apiTrackingMiddleware } from './middleware/apiTrackingMiddleware.js';
 import apiRoutes from './routes/index.js';
+
+// Get __dirname for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Create Express application
 const app = express();
+
+// Configure Handlebars view engine
+app.engine('hbs', engine({
+    extname: '.hbs',
+    defaultLayout: false,
+    helpers: {
+        json: function (context) {
+            return JSON.stringify(context);
+        }
+    }
+}));
+app.set('view engine', 'hbs');
+app.set('views', path.join(__dirname, '../templates'));
 
 // Apply middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(loggingMiddleware);
+app.use(apiTrackingMiddleware); // Track API usage
 app.use(cookieParser());
 
 

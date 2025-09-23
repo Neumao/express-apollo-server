@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -15,38 +9,52 @@ datasource db {
 }
 
 model User {
-  id              String  @id @default(uuid()) @db.Uuid
-  email           String  @unique
-  password        String
-  userName        String?
-  firstName       String?
-  lastName        String?
-  profileImageUrl String?
-  isActive        Boolean @default(true)
-  isVerified      Boolean @default(false)
-  role            Role    @default(USER)
-  phoneNumber     String? @unique
-
-  // Authentication tokens
-  authToken            String?
-  authTokenExpiry      DateTime?
-  // Password management
-  resetPasswordToken   String?
-  resetPasswordExpires DateTime?
-  passwordLastChanged  DateTime?
-
-  // Email verification
+  id                      String       @id @default(uuid()) @db.Uuid
+  email                   String       @unique
+  firstName               String?
+  lastName                String?
+  profileImageUrl         String?
+  isActive                Boolean      @default(true)
+  isVerified              Boolean      @default(false)
+  role                    Role         @default(USER)
+  phoneNumber             String?      @unique
+  authToken               String?
+  authTokenExpiry         DateTime?
+  resetPasswordToken      String?
+  resetPasswordExpires    DateTime?
+  passwordLastChanged     DateTime?
   emailVerificationToken  String?
   emailVerificationExpiry DateTime?
+  failedLoginAttempts     Int          @default(0)
+  lastLoginAt             DateTime?
+  lastActiveAt            DateTime?
+  createdAt               DateTime     @default(now())
+  updatedAt               DateTime     @updatedAt
+  deletedAt               DateTime?
+  userName                String?
+  password                String
+  apiRequests             ApiRequest[]
+}
 
-  // Account management
-  failedLoginAttempts Int       @default(0)
-  lastLoginAt         DateTime?
-  lastActiveAt        DateTime?
-  // Timestamps
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
-  deletedAt           DateTime?
+model ApiRequest {
+  id           String   @id @default(uuid()) @db.Uuid
+  endpoint     String
+  method       String
+  statusCode   Int
+  responseTime Int
+  userId       String?  @db.Uuid
+  userAgent    String?
+  ipAddress    String?
+  timestamp    DateTime @default(now())
+  error        String?
+  isCached     Boolean  @default(false)
+  isError      Boolean  @default(false)
+  user         User?    @relation(fields: [userId], references: [id])
+
+  @@index([timestamp])
+  @@index([endpoint])
+  @@index([userId])
+  @@index([statusCode])
 }
 
 enum Role {
