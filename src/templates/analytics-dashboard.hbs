@@ -728,10 +728,10 @@
         const userGrowthChart = new Chart(userGrowthCtx, {
             type: 'bar',
             data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                labels: [{{#each monthlyGrowth}}'{{month}}',{{/each}}],
                 datasets: [{
                     label: 'New Users',
-                    data: [12, 19, 15, 25, 22, {{users.newUsers}}],
+                    data: [{{#each monthlyGrowth}}{{newUsers}},{{/each}}],
                     backgroundColor: 'rgba(255, 193, 7, 0.8)',
                     borderColor: 'var(--warning)',
                     borderWidth: 1,
@@ -739,7 +739,7 @@
                     borderSkipped: false
                 }, {
                     label: 'Active Users',
-                    data: [8, 15, 12, 20, 18, {{users.activeUsers}}],
+                    data: [{{#each monthlyGrowth}}{{activeUsers}},{{/each}}],
                     backgroundColor: 'rgba(0, 123, 255, 0.8)',
                     borderColor: 'var(--primary)',
                     borderWidth: 1,
@@ -773,13 +773,16 @@
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0,0,0,0.05)'
-                        },
+                        min: 0,
                         ticks: {
+                            stepSize: 1,
+                            precision: 0,
                             font: {
                                 size: 10
                             }
+                        },
+                        grid: {
+                            color: 'rgba(0,0,0,0.05)'
                         }
                     },
                     x: {

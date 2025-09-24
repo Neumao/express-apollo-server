@@ -173,6 +173,59 @@ export class AnalyticsService {
     }
 
     /**
+     * Get Monthly User Growth Data
+     * Returns user registration data for the last 6 months
+     */
+    static async getMonthlyUserGrowth() {
+        try {
+            logger.debug('Getting monthly user growth data...');
+
+            const now = new Date();
+            const monthlyData = [];
+
+            // Get data for last 6 months
+            for (let i = 5; i >= 0; i--) {
+                const monthStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+
+                const [newUsers, activeUsers] = await Promise.all([
+                    prisma.user.count({
+                        where: {
+                            createdAt: {
+                                gte: monthStart,
+                                lt: monthEnd
+                            }
+                        }
+                    }),
+                    prisma.user.count({
+                        where: {
+                            lastLoginAt: {
+                                gte: monthStart,
+                                lt: monthEnd
+                            }
+                        }
+                    })
+                ]);
+
+                const monthName = monthStart.toLocaleDateString('en-US', { month: 'short' });
+
+                monthlyData.push({
+                    month: monthName,
+                    newUsers: newUsers,
+                    activeUsers: activeUsers
+                });
+            }
+
+            logger.debug('Monthly user growth data retrieved');
+            return monthlyData;
+
+        } catch (error) {
+            logger.error('Error getting monthly user growth data:', error);
+            throw new Error('Failed to get monthly user growth data');
+        }
+    }
+
+    /**
      * Dashboard Data Aggregator
      * Combines all analytics data for dashboard display
      */
@@ -180,14 +233,16 @@ export class AnalyticsService {
         try {
             logger.debug('Aggregating dashboard data...');
 
-            const [systemMetrics, userAnalytics] = await Promise.all([
+            const [systemMetrics, userAnalytics, monthlyGrowth] = await Promise.all([
                 this.getSystemMetrics(),
-                this.getUserAnalytics('24h')
+                this.getUserAnalytics('24h'),
+                this.getMonthlyUserGrowth()
             ]);
 
             const dashboard = {
                 system: systemMetrics,
                 users: userAnalytics.summary,
+                monthlyGrowth: monthlyGrowth,
                 generatedAt: new Date().toISOString()
             };
 

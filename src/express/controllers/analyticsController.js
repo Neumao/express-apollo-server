@@ -85,6 +85,7 @@ export class AnalyticsController {
                     }
                 },
                 users: dashboardData.users,
+                monthlyGrowth: dashboardData.monthlyGrowth,
                 generatedAt: dashboardData.generatedAt
             };
 
