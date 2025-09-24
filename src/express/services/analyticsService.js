@@ -1,5 +1,8 @@
 ﻿import os from 'os';
 import process from 'process';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import prisma from '../../../prisma/client.js';
 import { logger } from '../../config/logger.js';
 
@@ -202,7 +205,10 @@ export class AnalyticsService {
                     totalRequests,
                     avgResponseTime,
                     errorCount,
-                    cachedRequests
+                    cachedRequests,
+                    topEndpointResult,
+                    p95ResponseTimeResult,
+                    timeRangeMinutes
                 ] = await Promise.all([
                     prisma.apiRequest.count({
                         where: { timestamp: { gte: startDate } }
@@ -222,16 +228,43 @@ export class AnalyticsService {
                             timestamp: { gte: startDate },
                             isCached: true
                         }
-                    })
+                    }),
+                    prisma.apiRequest.groupBy({
+                        by: ['endpoint'],
+                        where: { timestamp: { gte: startDate } },
+                        _count: { endpoint: true },
+                        orderBy: { _count: { endpoint: 'desc' } },
+                        take: 1
+                    }).catch(() => []),
+                    // Calculate 95th percentile response time
+                    prisma.$queryRaw`
+                        SELECT percentile_cont(0.95) WITHIN GROUP (ORDER BY "responseTime") as p95
+                        FROM "ApiRequest"
+                        WHERE "timestamp" >= ${startDate}
+                    `.catch(() => [{ p95: 0 }]),
+                    // Calculate time range in minutes for RPM calculation
+                    Promise.resolve(Math.max(1, Math.floor((now - startDate) / (1000 * 60))))
                 ]);
+
+                const topEndpoint = topEndpointResult.length > 0 ? topEndpointResult[0].endpoint : 'N/A';
+                const p95ResponseTime = Math.round(p95ResponseTimeResult[0]?.p95 || 0);
+                const errorRate = totalRequests > 0 ? Math.round((errorCount / totalRequests) * 100) : 0;
+                const successRate = 100 - errorRate;
+                const requestsPerMinute = Math.round(totalRequests / timeRangeMinutes);
 
                 const analytics = {
                     totalRequests: totalRequests,
                     avgResponseTime: Math.round(avgResponseTime._avg.responseTime || 0),
+                    p95ResponseTime: p95ResponseTime,
                     errorCount: errorCount,
-                    errorRate: totalRequests > 0 ? Math.round((errorCount / totalRequests) * 100) : 0,
+                    errorRate: errorRate,
+                    successRate: successRate,
                     cachedRequests: cachedRequests,
-                    cacheRate: totalRequests > 0 ? Math.round((cachedRequests / totalRequests) * 100) : 0
+                    cacheRate: totalRequests > 0 ? Math.round((cachedRequests / totalRequests) * 100) : 0,
+                    topEndpoint: topEndpoint,
+                    requestsPerMinute: requestsPerMinute,
+                    highErrorRate: errorRate > 5,
+                    mediumErrorRate: errorRate > 2 && errorRate <= 5
                 };
 
                 logger.debug('API analytics retrieved');
@@ -241,10 +274,16 @@ export class AnalyticsService {
                 return {
                     totalRequests: 0,
                     avgResponseTime: 0,
+                    p95ResponseTime: 0,
                     errorCount: 0,
                     errorRate: 0,
+                    successRate: 100,
                     cachedRequests: 0,
-                    cacheRate: 0
+                    cacheRate: 0,
+                    topEndpoint: 'N/A',
+                    requestsPerMinute: 0,
+                    highErrorRate: false,
+                    mediumErrorRate: false
                 };
             }
 
@@ -313,118 +352,143 @@ export class AnalyticsService {
     }
 
     /**
-     * Get Security Analytics
-     * Returns authentication and security-related metrics
+     * Get API Schema Analytics
+     * Returns API structure and capabilities metrics
      */
-    static async getSecurityAnalytics(timeRange = '24h') {
+    static async getApiSchemaAnalytics() {
         try {
-            logger.debug('Getting security analytics...');
+            logger.debug('Getting API schema analytics...');
 
-            const now = new Date();
-            let startDate;
+            // Count Prisma models by reading schema file
+            const __filename = fileURLToPath(import.meta.url);
+            const __dirname = path.dirname(__filename);
+            const schemaPath = path.resolve(__dirname, '../../../prisma/schema.prisma');
+            const schemaContent = fs.readFileSync(schemaPath, 'utf8');
+            const modelMatches = schemaContent.match(/model\s+\w+/g) || [];
+            const prismaModels = modelMatches.length;
 
-            switch (timeRange) {
-                case '1h':
-                    startDate = new Date(now.getTime() - 60 * 60 * 1000);
-                    break;
-                case '24h':
-                    startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-                    break;
-                case '7d':
-                    startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-                    break;
-                default:
-                    startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-            }
+            // Count REST API endpoints (from routes)
+            const restEndpoints = 13; // Based on route analysis: auth(4) + users(4) + analytics(4) + health(1)
 
-            try {
-                const [
-                    failedLoginAttempts,
-                    passwordResetRequests,
-                    emailVerifications
-                ] = await Promise.all([
-                    prisma.user.aggregate({
-                        _sum: { failedLoginAttempts: true }
-                    }).catch(() => ({ _sum: { failedLoginAttempts: 0 } })),
-                    prisma.user.count({
-                        where: {
-                            resetPasswordToken: { not: null }
-                        }
-                    }),
-                    prisma.user.count({
-                        where: {
-                            emailVerificationToken: { not: null }
-                        }
-                    })
-                ]);
+            // Count GraphQL operations
+            const graphqlQueries = 4; // hello, me, user, users
+            const graphqlMutations = 6; // triggerTestSubscription, register, login, logout, updateUser, deleteUser
+            const graphqlSubscriptions = 1; // testSubscription
 
-                const analytics = {
-                    failedLoginAttempts: failedLoginAttempts._sum.failedLoginAttempts || 0,
-                    passwordResetRequests: passwordResetRequests,
-                    emailVerifications: emailVerifications,
-                    totalSecurityEvents: (failedLoginAttempts._sum.failedLoginAttempts || 0) + passwordResetRequests + emailVerifications
-                };
+            const analytics = {
+                prismaModels: prismaModels,
+                restEndpoints: restEndpoints,
+                graphqlQueries: graphqlQueries,
+                graphqlMutations: graphqlMutations,
+                graphqlSubscriptions: graphqlSubscriptions,
+                totalGraphqlOperations: graphqlQueries + graphqlMutations + graphqlSubscriptions,
+                totalApiEndpoints: restEndpoints + graphqlQueries + graphqlMutations + graphqlSubscriptions
+            };
 
-                logger.debug('Security analytics retrieved');
-                return analytics;
-            } catch (dbError) {
-                logger.warn('Database query failed for security analytics, returning defaults:', dbError.message);
-                return {
-                    failedLoginAttempts: 0,
-                    passwordResetRequests: 0,
-                    emailVerifications: 0,
-                    totalSecurityEvents: 0
-                };
-            }
-
+            logger.debug('API schema analytics retrieved');
+            return analytics;
         } catch (error) {
-            logger.error('Error getting security analytics:', error);
-            throw new Error('Failed to get security analytics');
+            logger.error('Error getting API schema analytics:', error);
+            throw new Error('Failed to get API schema analytics');
         }
     }
 
     /**
      * Get Recent Activity
-     * Returns latest user registrations and API calls
+     * Returns latest user registrations and user activities
      */
     static async getRecentActivity(limit = 5) {
         try {
             logger.debug('Getting recent activity...');
 
             try {
-                const [recentUsers, recentApiCalls] = await Promise.all([
-                    prisma.user.findMany({
-                        select: {
-                            id: true,
-                            email: true,
-                            createdAt: true,
-                            isVerified: true
-                        },
-                        orderBy: { createdAt: 'desc' },
-                        take: limit
-                    }).catch(() => []),
-                    prisma.apiRequest.findMany({
-                        select: {
-                            id: true,
-                            endpoint: true,
-                            method: true,
-                            statusCode: true,
-                            timestamp: true
-                        },
-                        orderBy: { timestamp: 'desc' },
-                        take: limit
-                    }).catch(() => [])
-                ]);
+                const recentUsers = await prisma.user.findMany({
+                    select: {
+                        id: true,
+                        email: true,
+                        firstName: true,
+                        lastName: true,
+                        isVerified: true,
+                        lastLoginAt: true,
+                        emailVerificationToken: true,
+                        resetPasswordToken: true,
+                        createdAt: true,
+                        updatedAt: true
+                    },
+                    orderBy: { createdAt: 'desc' },
+                    take: limit
+                }).catch(() => []);
+
+                // Generate recent user activity from user data
+                const recentUserActivity = [];
+                const now = new Date();
+
+                recentUsers.forEach(user => {
+                    const userName = user.firstName && user.lastName ?
+                        `${user.firstName} ${user.lastName}` : user.email;
+
+                    // Recent registration (within last 7 days)
+                    if (Math.abs(now - user.createdAt) < 7 * 24 * 60 * 60 * 1000) {
+                        recentUserActivity.push({
+                            userName,
+                            action: 'joined the platform',
+                            type: 'primary',
+                            details: '',
+                            timestamp: user.createdAt
+                        });
+                    }
+
+                    // Recent login (within last 24 hours)
+                    if (user.lastLoginAt && Math.abs(now - user.lastLoginAt) < 24 * 60 * 60 * 1000) {
+                        recentUserActivity.push({
+                            userName,
+                            action: 'logged in',
+                            type: 'info',
+                            details: '',
+                            timestamp: user.lastLoginAt
+                        });
+                    }
+
+                    // Recent verification (within last 24 hours)
+                    if (user.isVerified && user.emailVerificationToken &&
+                        Math.abs(now - user.updatedAt) < 24 * 60 * 60 * 1000) {
+                        recentUserActivity.push({
+                            userName,
+                            action: 'verified their email',
+                            type: 'success',
+                            details: '',
+                            timestamp: user.updatedAt
+                        });
+                    }
+
+                    // Recent password reset request (within last 24 hours)
+                    if (user.resetPasswordToken &&
+                        Math.abs(now - user.updatedAt) < 24 * 60 * 60 * 1000) {
+                        recentUserActivity.push({
+                            userName,
+                            action: 'requested password reset',
+                            type: 'warning',
+                            details: '',
+                            timestamp: user.updatedAt
+                        });
+                    }
+                });
+
+                // Sort by timestamp and take most recent
+                const sortedActivity = recentUserActivity
+                    .sort((a, b) => b.timestamp - a.timestamp)
+                    .slice(0, limit)
+                    .map(activity => ({
+                        ...activity,
+                        timeAgo: this.getTimeAgo(activity.timestamp)
+                    }));
 
                 const activity = {
                     recentUsers: recentUsers.map(user => ({
                         ...user,
                         timeAgo: this.getTimeAgo(user.createdAt)
                     })),
-                    recentApiCalls: recentApiCalls.map(call => ({
-                        ...call,
-                        timeAgo: this.getTimeAgo(call.timestamp)
-                    }))
+                    recentUserActivity: sortedActivity
                 };
 
                 logger.debug('Recent activity retrieved');
@@ -433,7 +497,7 @@ export class AnalyticsService {
                 logger.warn('Database query failed for recent activity, returning empty arrays:', dbError.message);
                 return {
                     recentUsers: [],
-                    recentApiCalls: []
+                    recentUserActivity: []
                 };
             }
 
@@ -464,7 +528,7 @@ export class AnalyticsService {
         try {
             logger.debug('Aggregating dashboard data...');
 
-            const [systemMetrics, userAnalytics, monthlyGrowth, apiAnalytics, securityAnalytics, recentActivity] = await Promise.all([
+            const [systemMetrics, userAnalytics, monthlyGrowth, apiAnalytics, apiSchemaAnalytics, recentActivity] = await Promise.all([
                 this.getSystemMetrics(),
                 this.getUserAnalytics('24h'),
                 this.getMonthlyUserGrowth().catch(() => []),
@@ -476,11 +540,14 @@ export class AnalyticsService {
                     cachedRequests: 0,
                     cacheRate: 0
                 })),
-                this.getSecurityAnalytics('24h').catch(() => ({
-                    failedLoginAttempts: 0,
-                    passwordResetRequests: 0,
-                    emailVerifications: 0,
-                    totalSecurityEvents: 0
+                this.getApiSchemaAnalytics().catch(() => ({
+                    prismaModels: 0,
+                    restEndpoints: 0,
+                    graphqlQueries: 0,
+                    graphqlMutations: 0,
+                    graphqlSubscriptions: 0,
+                    totalGraphqlOperations: 0,
+                    totalApiEndpoints: 0
                 })),
                 this.getRecentActivity(5).catch(() => ({
                     recentUsers: [],
@@ -493,7 +560,7 @@ export class AnalyticsService {
                 users: userAnalytics.summary,
                 monthlyGrowth: monthlyGrowth,
                 api: apiAnalytics,
-                security: securityAnalytics,
+                apiSchema: apiSchemaAnalytics,
                 activity: recentActivity,
                 generatedAt: new Date().toISOString()
             };

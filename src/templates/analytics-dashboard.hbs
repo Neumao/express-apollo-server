@@ -282,6 +282,80 @@
             font-weight: 500;
         }
 
+        /* Enhanced API Call Styles */
+        .api-call-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
+
+        .api-call-main {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            gap: 8px;
+        }
+
+        .api-call-details {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: var(--font-size-sm);
+            color: var(--gray);
+        }
+
+        .user-info {
+            flex: 1;
+            font-style: italic;
+        }
+
+        .response-time {
+            font-weight: 600;
+            color: var(--info);
+            font-size: var(--font-size-sm);
+        }
+
+        .cache-badge {
+            color: var(--warning);
+            margin-left: 4px;
+        }
+
+        .error-badge {
+            color: var(--danger);
+            margin-left: 4px;
+        }
+
+        .activity-badge.success {
+            background: var(--success);
+            color: white;
+        }
+
+        .activity-badge.warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .activity-badge.danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .activity-badge.info {
+            background: var(--info);
+            color: white;
+        }
+
+        .activity-badge.primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .empty-state {
+            justify-content: center !important;
+            color: var(--gray);
+            font-style: italic;
+        }
+
         .status-indicator {
             display: inline-block;
             width: 8px;
@@ -651,65 +725,114 @@
                 </div>
             </div>
 
-            <!-- Security Analytics -->
+            <!-- API Schema Analytics -->
             <div class="card">
                 <div class="card-header">
-                    <h3><i class="fas fa-shield-alt"></i> Security Analytics</h3>
+                    <h3><i class="fas fa-code-branch"></i> API Schema Analytics</h3>
                 </div>
                 <div class="card-body">
                     <div class="metric-grid">
                         <div class="metric-item">
                             <span class="metric-label">
-                                <i class="fas fa-lock"></i> Failed Login Attempts
+                                <i class="fas fa-database"></i> Prisma Models
                             </span>
-                            <span class="metric-value danger">{{security.failedLoginAttempts}}</span>
+                            <span class="metric-value primary">{{apiSchema.prismaModels}}</span>
                         </div>
                         <div class="metric-item">
                             <span class="metric-label">
-                                <i class="fas fa-key"></i> Password Resets
+                                <i class="fas fa-server"></i> REST APIs
                             </span>
-                            <span class="metric-value warning">{{security.passwordResetRequests}}</span>
+                            <span class="metric-value info">{{apiSchema.restEndpoints}}</span>
                         </div>
                         <div class="metric-item">
                             <span class="metric-label">
-                                <i class="fas fa-envelope"></i> Email Verifications
+                                <i class="fas fa-search"></i> GraphQL Queries
                             </span>
-                            <span class="metric-value info">{{security.emailVerifications}}</span>
+                            <span class="metric-value success">{{apiSchema.graphqlQueries}}</span>
                         </div>
                         <div class="metric-item">
                             <span class="metric-label">
-                                <i class="fas fa-user-shield"></i> Security Events
+                                <i class="fas fa-edit"></i> GraphQL Mutations
                             </span>
-                            <span class="metric-value">{{security.totalSecurityEvents}}</span>
+                            <span class="metric-value warning">{{apiSchema.graphqlMutations}}</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">
+                                <i class="fas fa-broadcast-tower"></i> GraphQL Subscriptions
+                            </span>
+                            <span class="metric-value danger">{{apiSchema.graphqlSubscriptions}}</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">
+                                <i class="fas fa-cogs"></i> Total Operations
+                            </span>
+                            <span class="metric-value">{{apiSchema.totalApiEndpoints}}</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Recent Activity -->
+            <!-- API Performance Summary -->
             <div class="card">
                 <div class="card-header">
-                    <h3><i class="fas fa-history"></i> Recent Activity</h3>
+                    <h3><i class="fas fa-tachometer-alt"></i> API Performance Summary</h3>
                 </div>
                 <div class="card-body">
-                    <div class="activity-section">
-                        <h4><i class="fas fa-user-plus"></i> Latest Registrations</h4>
-                        {{#each activity.recentUsers}}
-                        <div class="activity-item">
-                            <span class="activity-text">{{email}}</span>
-                            <span class="activity-time">{{timeAgo}}</span>
+                    <div class="metric-grid">
+                        <div class="metric-item">
+                            <span class="metric-label">
+                                <i class="fas fa-clock"></i> Avg Response Time
+                            </span>
+                            <span class="metric-value info">{{api.avgResponseTime}}ms</span>
                         </div>
-                        {{/each}}
-                    </div>
-                    <div class="activity-section">
-                        <h4><i class="fas fa-exchange-alt"></i> Latest API Calls</h4>
-                        {{#each activity.recentApiCalls}}
-                        <div class="activity-item">
-                            <span class="activity-text">{{method}} {{endpoint}}</span>
-                            <span class="activity-badge" data-status="{{statusCode}}">{{statusCode}}</span>
-                            <span class="activity-time">{{timeAgo}}</span>
+                        <div class="metric-item">
+                            <span class="metric-label">
+                                <i class="fas fa-chart-line"></i> 95th Percentile
+                            </span>
+                            <span class="metric-value warning">{{api.p95ResponseTime}}ms</span>
                         </div>
-                        {{/each}}
+                        <div class="metric-item">
+                            <span class="metric-label">
+                                <i class="fas fa-check-circle"></i> Success Rate
+                            </span>
+                            <span class="metric-value success">{{api.successRate}}%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">
+                                <i class="fas fa-exclamation-triangle"></i> Error Rate
+                            </span>
+                            <span class="metric-value {{#if api.highErrorRate}}danger{{else if api.mediumErrorRate}}warning{{else}}success{{/if}}">{{api.errorRate}}%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">
+                                <i class="fas fa-bolt"></i> Cache Hit Rate
+                            </span>
+                            <span class="metric-value success">{{api.cacheRate}}%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">
+                                <i class="fas fa-tachometer-alt"></i> Requests/Min
+                            </span>
+                            <span class="metric-value primary">{{api.requestsPerMinute}}</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">
+                                <i class="fas fa-server"></i> Total Requests (24h)
+                            </span>
+                            <span class="metric-value primary">{{api.totalRequests}}</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">
+                                <i class="fas fa-route"></i> Most Used Endpoint
+                            </span>
+                            <span class="metric-value" title="{{api.topEndpoint}}">{{api.topEndpoint}}</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">
+                                <i class="fas fa-shield-alt"></i> Uptime
+                            </span>
+                            <span class="metric-value success">{{system.uptime}}</span>
+                        </div>
                     </div>
                 </div>
             </div>
