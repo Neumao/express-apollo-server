@@ -735,7 +735,7 @@ export class AnalyticsService {
                     totalGraphqlOperations: 0,
                     totalApiEndpoints: 0
                 })),
-                ]);
+            ]);
 
             const dashboard = {
                 system: systemMetrics,
