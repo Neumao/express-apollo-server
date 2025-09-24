@@ -75,7 +75,15 @@ export class AnalyticsController {
             const templateData = {
                 title: 'Apollo GraphQL Analytics Dashboard',
                 timestamp: new Date().toLocaleString(),
-                system: dashboardData.system,
+                system: {
+                    ...dashboardData.system,
+                    cpu: {
+                        ...dashboardData.system.cpu,
+                        loadAverage1m: dashboardData.system.cpu.loadAverage[0],
+                        loadAverage5m: dashboardData.system.cpu.loadAverage[1],
+                        loadAverage15m: dashboardData.system.cpu.loadAverage[2]
+                    }
+                },
                 users: dashboardData.users,
                 generatedAt: dashboardData.generatedAt
             };

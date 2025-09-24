@@ -180,15 +180,23 @@
                 </div>
                 <div class="metric">
                     <span class="metric-label">CPU Cores</span>
-                    <span class="metric-value">{{system.cpu.cores}}</span>
+                    <span class="metric-value">{{system.cpu.cores}} cores</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Load Average (1m)</span>
+                    <span class="metric-value">{{system.cpu.loadAverage1m}}</span>
                 </div>
                 <div class="metric">
                     <span class="metric-label">Memory Used</span>
-                    <span class="metric-value">{{system.memory.used}} MB</span>
+                    <span class="metric-value">{{system.memory.used}} MB ({{system.memory.usedGB}} GB)</span>
                 </div>
                 <div class="metric">
                     <span class="metric-label">Memory Total</span>
-                    <span class="metric-value">{{system.memory.total}} MB</span>
+                    <span class="metric-value">{{system.memory.total}} MB ({{system.memory.totalGB}} GB)</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Memory Free</span>
+                    <span class="metric-value">{{system.memory.free}} MB ({{system.memory.freeGB}} GB)</span>
                 </div>
                 <div class="metric">
                     <span class="metric-label">Memory Usage</span>
@@ -196,7 +204,15 @@
                 </div>
                 <div class="metric">
                     <span class="metric-label">Process Uptime</span>
-                    <span class="metric-value">{{system.process.uptime}}s</span>
+                    <span class="metric-value">{{system.process.uptimeFormatted}} ({{system.process.uptime}}s)</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Heap Used</span>
+                    <span class="metric-value">{{system.process.heapUsed}} MB</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">RSS Memory</span>
+                    <span class="metric-value">{{system.process.rss}} MB</span>
                 </div>
             </div>
 
@@ -255,6 +271,12 @@
                     data: [{{system.memory.usagePercent}}, {{system.memory.usagePercent}}, {{system.memory.usagePercent}}, {{system.memory.usagePercent}}, {{system.memory.usagePercent}}, {{system.memory.usagePercent}}],
                     borderColor: '#764ba2',
                     backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'Load Average',
+                    data: [{{system.cpu.loadAverage1m}}, {{system.cpu.loadAverage1m}}, {{system.cpu.loadAverage1m}}, {{system.cpu.loadAverage1m}}, {{system.cpu.loadAverage1m}}, {{system.cpu.loadAverage1m}}],
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
                     tension: 0.4
                 }]
             },
