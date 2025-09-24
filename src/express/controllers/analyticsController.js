@@ -88,6 +88,10 @@ export class AnalyticsController {
                 monthlyGrowth: dashboardData.monthlyGrowth,
                 api: dashboardData.api,
                 apiSchema: dashboardData.apiSchema,
+                advanced: dashboardData.advanced,
+                business: dashboardData.business,
+                performance: dashboardData.performance,
+                traffic: dashboardData.traffic,
                 activity: dashboardData.activity,
                 generatedAt: dashboardData.generatedAt
             };

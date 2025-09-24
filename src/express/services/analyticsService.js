@@ -426,8 +426,10 @@ export class AnalyticsService {
 
                 const analytics = {
                     requestPatterns: requestPatterns,
-                    anomalyDetected: anomalyDetected ? 'High traffic detected' : 'Normal traffic',
-                    costAnalysis: costEstimate,
+                    hasAnomalies: anomalyDetected,
+                    anomalyStatus: anomalyDetected ? 'High traffic detected' : 'Normal traffic',
+                    costEstimate: costEstimate,
+                    slaCompliant: (avgResponseTime._avg.responseTime || 0) < 1000,
                     slaCompliance: slaCompliance
                 };
 
@@ -439,9 +441,9 @@ export class AnalyticsService {
                     requestPatterns: 'N/A',
                     hasAnomalies: false,
                     anomalyStatus: 'Normal',
-                    costEstimate: '0.00',
+                    costEstimate: '$0.00',
                     slaCompliant: true,
-                    slaCompliance: 100
+                    slaCompliance: '100%'
                 };
             }
         } catch (error) {
@@ -708,7 +710,17 @@ export class AnalyticsService {
         try {
             logger.debug('Aggregating dashboard data...');
 
-            const [systemMetrics, userAnalytics, monthlyGrowth, apiAnalytics, apiSchemaAnalytics] = await Promise.all([
+            const [
+                systemMetrics,
+                userAnalytics,
+                monthlyGrowth,
+                apiAnalytics,
+                apiSchemaAnalytics,
+                advancedAnalytics,
+                businessAnalytics,
+                performanceAnalytics,
+                trafficAnalytics
+            ] = await Promise.all([
                 this.getSystemMetrics(),
                 this.getUserAnalytics('24h'),
                 this.getMonthlyUserGrowth().catch(() => []),
@@ -735,6 +747,33 @@ export class AnalyticsService {
                     totalGraphqlOperations: 0,
                     totalApiEndpoints: 0
                 })),
+                this.getAdvancedAnalytics().catch(() => ({
+                    requestPatterns: 'No data',
+                    anomalyDetected: 'No data',
+                    costAnalysis: '$0.00',
+                    slaCompliance: '0%'
+                })),
+                this.getBusinessAnalytics().catch(() => ({
+                    userEngagementScore: 0,
+                    topRegion: 'N/A',
+                    topDevice: 'N/A',
+                    apiVersions: 0
+                })),
+                this.getPerformanceAnalytics().catch(() => ({
+                    p95ResponseTime: 0,
+                    peakResponseTime: 0,
+                    fastRequests: 0,
+                    mediumRequests: 0,
+                    slowRequests: 0,
+                    requestsPerSecond: 0
+                })),
+                this.getTrafficAnalytics().catch(() => ({
+                    requestsPerHour: 0,
+                    peakHour: 'N/A',
+                    restRequests: 0,
+                    graphqlRequests: 0,
+                    mostActiveUser: 'N/A'
+                }))
             ]);
 
             const dashboard = {
@@ -743,6 +782,10 @@ export class AnalyticsService {
                 monthlyGrowth: monthlyGrowth,
                 api: apiAnalytics,
                 apiSchema: apiSchemaAnalytics,
+                advanced: advancedAnalytics,
+                business: businessAnalytics,
+                performance: performanceAnalytics,
+                traffic: trafficAnalytics,
                 generatedAt: new Date().toISOString()
             };
 
