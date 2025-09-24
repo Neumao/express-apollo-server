@@ -772,66 +772,141 @@
                 </div>
             </div>
 
-            <!-- API Performance Summary -->
+            <!-- Advanced Analytics -->
             <div class="card">
                 <div class="card-header">
-                    <h3><i class="fas fa-tachometer-alt"></i> API Performance Summary</h3>
+                    <h3><i class="fas fa-brain"></i> Advanced Analytics</h3>
                 </div>
                 <div class="card-body">
                     <div class="metric-grid">
                         <div class="metric-item">
                             <span class="metric-label">
-                                <i class="fas fa-clock"></i> Avg Response Time
+                                <i class="fas fa-chart-area"></i> Request Patterns
                             </span>
-                            <span class="metric-value info">{{api.avgResponseTime}}ms</span>
+                            <span class="metric-value info">{{advanced.requestPatterns}}</span>
                         </div>
+                        <div class="metric-item">
+                            <span class="metric-label">
+                                <i class="fas fa-exclamation-circle"></i> Anomaly Detection
+                            </span>
+                            <span class="metric-value {{#if advanced.hasAnomalies}}danger{{else}}success{{/if}}">{{advanced.anomalyStatus}}</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">
+                                <i class="fas fa-dollar-sign"></i> Cost Analysis
+                            </span>
+                            <span class="metric-value primary">${{advanced.costEstimate}}</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">
+                                <i class="fas fa-handshake"></i> SLA Compliance
+                            </span>
+                            <span class="metric-value {{#if advanced.slaCompliant}}success{{else}}warning{{/if}}">{{advanced.slaCompliance}}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Business Intelligence -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-pie"></i> Business Intelligence</h3>
+                </div>
+                <div class="card-body">
+                    <div class="metric-grid">
+                        <div class="metric-item">
+                            <span class="metric-label">
+                                <i class="fas fa-user-friends"></i> User Engagement
+                            </span>
+                            <span class="metric-value success">{{business.userEngagementScore}}</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">
+                                <i class="fas fa-globe"></i> Top Region
+                            </span>
+                            <span class="metric-value info">{{business.topRegion}}</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">
+                                <i class="fas fa-mobile-alt"></i> Top Device
+                            </span>
+                            <span class="metric-value primary">{{business.topDevice}}</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">
+                                <i class="fas fa-code-branch"></i> API Versions
+                            </span>
+                            <span class="metric-value warning">{{business.apiVersions}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Metrics -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-tachometer-alt"></i> Performance Metrics</h3>
+                </div>
+                <div class="card-body">
+                    <div class="metric-grid">
                         <div class="metric-item">
                             <span class="metric-label">
                                 <i class="fas fa-chart-line"></i> 95th Percentile
                             </span>
-                            <span class="metric-value warning">{{api.p95ResponseTime}}ms</span>
+                            <span class="metric-value warning">{{performance.p95ResponseTime}}ms</span>
                         </div>
                         <div class="metric-item">
                             <span class="metric-label">
-                                <i class="fas fa-check-circle"></i> Success Rate
+                                <i class="fas fa-arrow-up"></i> Peak Response
                             </span>
-                            <span class="metric-value success">{{api.successRate}}%</span>
+                            <span class="metric-value danger">{{performance.peakResponseTime}}ms</span>
                         </div>
                         <div class="metric-item">
                             <span class="metric-label">
-                                <i class="fas fa-exclamation-triangle"></i> Error Rate
+                                <i class="fas fa-balance-scale"></i> Response Distribution
                             </span>
-                            <span class="metric-value {{#if api.highErrorRate}}danger{{else if api.mediumErrorRate}}warning{{else}}success{{/if}}">{{api.errorRate}}%</span>
+                            <span class="metric-value info">{{performance.fastRequests}}/{{performance.mediumRequests}}/{{performance.slowRequests}}</span>
                         </div>
                         <div class="metric-item">
                             <span class="metric-label">
-                                <i class="fas fa-bolt"></i> Cache Hit Rate
+                                <i class="fas fa-rocket"></i> Requests/Second
                             </span>
-                            <span class="metric-value success">{{api.cacheRate}}%</span>
+                            <span class="metric-value success">{{performance.requestsPerSecond}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Traffic & Usage -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-route"></i> Traffic & Usage</h3>
+                </div>
+                <div class="card-body">
+                    <div class="metric-grid">
+                        <div class="metric-item">
+                            <span class="metric-label">
+                                <i class="fas fa-clock"></i> Requests/Hour
+                            </span>
+                            <span class="metric-value primary">{{traffic.requestsPerHour}}</span>
                         </div>
                         <div class="metric-item">
                             <span class="metric-label">
-                                <i class="fas fa-tachometer-alt"></i> Requests/Min
+                                <i class="fas fa-sun"></i> Peak Hour
                             </span>
-                            <span class="metric-value primary">{{api.requestsPerMinute}}</span>
+                            <span class="metric-value warning">{{traffic.peakHour}}</span>
                         </div>
                         <div class="metric-item">
                             <span class="metric-label">
-                                <i class="fas fa-server"></i> Total Requests (24h)
+                                <i class="fas fa-exchange-alt"></i> API vs GraphQL
                             </span>
-                            <span class="metric-value primary">{{api.totalRequests}}</span>
+                            <span class="metric-value info">{{traffic.restRequests}}/{{traffic.graphqlRequests}}</span>
                         </div>
                         <div class="metric-item">
                             <span class="metric-label">
-                                <i class="fas fa-route"></i> Most Used Endpoint
+                                <i class="fas fa-user"></i> Most Active User
                             </span>
-                            <span class="metric-value" title="{{api.topEndpoint}}">{{api.topEndpoint}}</span>
-                        </div>
-                        <div class="metric-item">
-                            <span class="metric-label">
-                                <i class="fas fa-shield-alt"></i> Uptime
-                            </span>
-                            <span class="metric-value success">{{system.uptime}}</span>
+                            <span class="metric-value success">{{traffic.mostActiveUser}}</span>
                         </div>
                     </div>
                 </div>
