@@ -511,7 +511,8 @@ export class AnalyticsService {
                 ]);
 
                 const userEngagementScore = totalUsers > 0 ? Math.round(totalRequests / totalUsers) : 0;
-                const topRegion = topRegionData.length > 0 ? topRegionData[0].ipAddress : 'N/A';
+                const topRegion = topRegionData.length > 0 ?
+                    (topRegionData[0].ipAddress === '::1' ? 'Localhost' : topRegionData[0].ipAddress) : 'N/A';
                 const topDevice = topDeviceData.length > 0 ?
                     (topDeviceData[0].userAgent?.substring(0, 20) + '...') : 'N/A';
                 const apiVersions = apiVersionsData.length;
