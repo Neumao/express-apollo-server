@@ -22,7 +22,7 @@ export class AnalyticsService {
             const freeMem = os.freemem();
             const usedMem = totalMem - freeMem;
 
-                                    // Calculate CPU usage (more accurate)
+            // Calculate CPU usage (more accurate)
             const cpuUsage = cpus.reduce((acc, cpu) => {
                 const total = Object.values(cpu.times).reduce((a, b) => a + b, 0);
                 const idle = cpu.times.idle;
