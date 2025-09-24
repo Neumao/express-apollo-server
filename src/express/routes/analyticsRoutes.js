@@ -1,5 +1,5 @@
-import express from 'express';
-import { AnalyticsController } from '../controllers/analytics/analyticsController.js';
+﻿import express from 'express';
+import { AnalyticsController } from '../controllers/analyticsController.js';
 import { authMiddleware, roleMiddleware } from '../middleware/index.js';
 
 const router = express.Router();
@@ -13,19 +13,32 @@ const router = express.Router();
 // router.use(authMiddleware);
 // router.use(roleMiddleware('ADMIN'));
 
-// Get server metrics
+/**
+ * @route GET /api/analytics/
+ * @desc Render analytics dashboard page
+ * @access Admin
+ */
+router.get('/', AnalyticsController.renderDashboard);
+
+/**
+ * @route GET /api/analytics/metrics
+ * @desc Get system metrics
+ * @access Admin
+ */
 router.get('/metrics', AnalyticsController.getMetrics);
 
-// Get recent logs
-router.get('/logs', AnalyticsController.getLogs);
-
-// Get available log files info
-router.get('/logs/info', AnalyticsController.getLogFilesInfo);
-
-// Get user analytics
+/**
+ * @route GET /api/analytics/users
+ * @desc Get user analytics
+ * @access Admin
+ */
 router.get('/users', AnalyticsController.getUserAnalytics);
 
-// Render analytics dashboard
-router.get('/', AnalyticsController.getDashboard);
+/**
+ * @route GET /api/analytics/dashboard
+ * @desc Get dashboard data (JSON)
+ * @access Admin
+ */
+router.get('/dashboard', AnalyticsController.getDashboard);
 
 export default router;
