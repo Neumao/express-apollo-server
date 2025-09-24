@@ -418,11 +418,11 @@ export class AnalyticsService {
                 const anomalyDetected = totalRequests > 100;
 
                 // Cost analysis ($0.001 per request)
-                const costEstimate = `$${(totalRequests * 0.001).toFixed(2)}`;
+                const costEstimate = `${(totalRequests * 0.001).toFixed(2)}`;
 
                 // SLA compliance (response time < 1000ms)
                 const slaCompliance = (avgResponseTime._avg.responseTime || 0) < 1000 ?
-                    '99%' : `${Math.max(0, 100 - Math.floor((avgResponseTime._avg.responseTime || 0) / 10))}%`;
+                    99 : Math.max(0, 100 - Math.floor((avgResponseTime._avg.responseTime || 0) / 10));
 
                 const analytics = {
                     requestPatterns: requestPatterns,
@@ -443,7 +443,7 @@ export class AnalyticsService {
                     anomalyStatus: 'Normal',
                     costEstimate: '$0.00',
                     slaCompliant: true,
-                    slaCompliance: '100%'
+                    slaCompliance: 100
                 };
             }
         } catch (error) {
@@ -502,20 +502,19 @@ export class AnalyticsService {
                         orderBy: { _count: { userAgent: 'desc' } },
                         take: 1
                     }).catch(() => []),
-                    // API version usage (simplified - looking for version in endpoint)
-                    prisma.apiRequest.count({
-                        where: {
-                            timestamp: { gte: startDate },
-                            endpoint: { contains: '/v' }
-                        }
-                    }).catch(() => 0)
+                    // API endpoint diversity (count unique endpoints)
+                    prisma.apiRequest.groupBy({
+                        by: ['endpoint'],
+                        where: { timestamp: { gte: startDate } },
+                        _count: { endpoint: true }
+                    }).catch(() => [])
                 ]);
 
                 const userEngagementScore = totalUsers > 0 ? Math.round(totalRequests / totalUsers) : 0;
                 const topRegion = topRegionData.length > 0 ? topRegionData[0].ipAddress : 'N/A';
                 const topDevice = topDeviceData.length > 0 ?
                     (topDeviceData[0].userAgent?.substring(0, 20) + '...') : 'N/A';
-                const apiVersions = apiVersionsData;
+                const apiVersions = apiVersionsData.length;
 
                 return {
                     userEngagementScore,
@@ -677,7 +676,9 @@ export class AnalyticsService {
                 const calculatedRequestsPerHour = Math.round(totalRequests / requestsPerHour);
                 const peakHour = peakHourData.length > 0 ?
                     new Date(peakHourData[0].timestamp).getHours() + ':00' : 'N/A';
-                const mostActiveUser = mostActiveUserData.length > 0 ? mostActiveUserData[0].userId : 'N/A';
+                const mostActiveUser = mostActiveUserData.length > 0 ?
+                    `User ${mostActiveUserData[0].userId}` :
+                    `${totalRequests} anonymous requests`;
 
                 return {
                     requestsPerHour: calculatedRequestsPerHour,
