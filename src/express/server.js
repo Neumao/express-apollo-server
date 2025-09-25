@@ -27,6 +27,34 @@ app.engine('hbs', engine({
     helpers: {
         json: function (context) {
             return JSON.stringify(context);
+        },
+        eq: function (a, b) {
+            return a === b;
+        },
+        gt: function (a, b) {
+            return a > b;
+        },
+        subtract: function (a, b) {
+            return a - b;
+        },
+        add: function (a, b) {
+            return a + b;
+        },
+        formatDate: function (date) {
+            return new Date(date).toLocaleString();
+        },
+        truncate: function (str, len) {
+            if (str && str.length > len) {
+                return str.substring(0, len) + '...';
+            }
+            return str;
+        },
+        capitalize: function (str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        },
+        countBy: function (array, property, value) {
+            if (!Array.isArray(array)) return 0;
+            return array.filter(item => item[property] === value).length;
         }
     }
 }));

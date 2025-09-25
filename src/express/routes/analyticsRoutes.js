@@ -41,4 +41,18 @@ router.get('/users', AnalyticsController.getUserAnalytics);
  */
 router.get('/dashboard', AnalyticsController.getDashboard);
 
+/**
+ * @route GET /api/analytics/api
+ * @desc Render detailed API analytics page
+ * @access Admin
+ */
+router.get('/api', AnalyticsController.getApiAnalyticsPage);
+
+/**
+ * @route GET /api/analytics/logs
+ * @desc Render logs page
+ * @access Admin
+ */
+router.get('/logs', AnalyticsController.getLogsPage);
+
 export default router;

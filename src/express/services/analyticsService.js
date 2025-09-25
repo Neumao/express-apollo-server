@@ -799,4 +799,237 @@ export class AnalyticsService {
             throw new Error('Failed to aggregate dashboard data');
         }
     }
+
+    /**
+     * Get Detailed API Analytics for dedicated page
+     * Returns comprehensive API analytics data
+     */
+    static async getDetailedApiAnalytics(timeRange = '24h', page = 1, limit = 50) {
+        try {
+            logger.debug('Getting detailed API analytics...', { timeRange, page, limit });
+
+            const now = new Date();
+            let startDate;
+
+            switch (timeRange) {
+                case '1h':
+                    startDate = new Date(now.getTime() - 60 * 60 * 1000);
+                    break;
+                case '24h':
+                    startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                    break;
+                case '7d':
+                    startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    break;
+                case '30d':
+                    startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                    break;
+                default:
+                    startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+            }
+
+            const skip = (page - 1) * limit;
+
+            // Get paginated API requests
+            const [requests, totalCount, stats] = await Promise.all([
+                // Paginated requests with details
+                prisma.apiRequest.findMany({
+                    where: { timestamp: { gte: startDate } },
+                    orderBy: { timestamp: 'desc' },
+                    skip,
+                    take: limit,
+                    select: {
+                        id: true,
+                        method: true,
+                        endpoint: true,
+                        responseTime: true,
+                        statusCode: true,
+                        ipAddress: true,
+                        userAgent: true,
+                        timestamp: true,
+                        userId: true
+                    }
+                }),
+                // Total count for pagination
+                prisma.apiRequest.count({
+                    where: { timestamp: { gte: startDate } }
+                }),
+                // Comprehensive stats
+                Promise.all([
+                    // Response time stats
+                    prisma.apiRequest.aggregate({
+                        where: { timestamp: { gte: startDate } },
+                        _avg: { responseTime: true },
+                        _min: { responseTime: true },
+                        _max: { responseTime: true }
+                    }),
+                    // Status code distribution
+                    prisma.apiRequest.groupBy({
+                        by: ['statusCode'],
+                        where: { timestamp: { gte: startDate } },
+                        _count: { statusCode: true }
+                    }),
+                    // Method distribution
+                    prisma.apiRequest.groupBy({
+                        by: ['method'],
+                        where: { timestamp: { gte: startDate } },
+                        _count: { method: true }
+                    }),
+                    // Top endpoints
+                    prisma.apiRequest.groupBy({
+                        by: ['endpoint'],
+                        where: { timestamp: { gte: startDate } },
+                        _count: { endpoint: true },
+                        orderBy: { _count: { endpoint: 'desc' } },
+                        take: 10
+                    }),
+                    // Hourly distribution
+                    prisma.$queryRaw`
+                        SELECT
+                            EXTRACT(HOUR FROM "timestamp") as hour,
+                            COUNT(*) as requests,
+                            AVG("responseTime") as avg_response_time
+                        FROM "ApiRequest"
+                        WHERE "timestamp" >= ${startDate}
+                        GROUP BY EXTRACT(HOUR FROM "timestamp")
+                        ORDER BY hour
+                    `.catch(() => []),
+                    // Rate limiting info (simulated)
+                    Promise.resolve({
+                        currentRequests: Math.floor(Math.random() * 100) + 50,
+                        limit: 1000,
+                        remaining: Math.floor(Math.random() * 900) + 100,
+                        resetTime: new Date(now.getTime() + 60 * 1000)
+                    })
+                ])
+            ]);
+
+            const [responseStats, statusDistribution, methodDistribution, topEndpoints, hourlyData, rateLimit] = stats;
+
+            // Calculate additional metrics
+            const totalPages = Math.ceil(totalCount / limit);
+            const successRate = statusDistribution.reduce((acc, stat) => {
+                return acc + (stat.statusCode >= 200 && stat.statusCode < 300 ? stat._count.statusCode : 0);
+            }, 0) / totalCount * 100;
+
+            const errorRate = statusDistribution.reduce((acc, stat) => {
+                return acc + (stat.statusCode >= 400 ? stat._count.statusCode : 0);
+            }, 0) / totalCount * 100;
+
+            const analytics = {
+                requests,
+                pagination: {
+                    currentPage: page,
+                    totalPages,
+                    totalCount,
+                    hasNext: page < totalPages,
+                    hasPrev: page > 1
+                },
+                statistics: {
+                    totalRequests: totalCount,
+                    avgResponseTime: Math.round(responseStats._avg.responseTime || 0),
+                    minResponseTime: Math.round(responseStats._min.responseTime || 0),
+                    maxResponseTime: Math.round(responseStats._max.responseTime || 0),
+                    successRate: Math.round(successRate * 100) / 100,
+                    errorRate: Math.round(errorRate * 100) / 100
+                },
+                distributions: {
+                    statusCodes: statusDistribution.map(s => ({
+                        code: s.statusCode,
+                        count: s._count.statusCode,
+                        percentage: Math.round((s._count.statusCode / totalCount) * 100 * 100) / 100
+                    })),
+                    methods: methodDistribution.map(m => ({
+                        method: m.method,
+                        count: m._count.method,
+                        percentage: Math.round((m._count.method / totalCount) * 100 * 100) / 100
+                    })),
+                    topEndpoints: topEndpoints.map(e => ({
+                        endpoint: e.endpoint,
+                        count: e._count.endpoint,
+                        percentage: Math.round((e._count.endpoint / totalCount) * 100 * 100) / 100
+                    }))
+                },
+                hourlyData: hourlyData.map(h => ({
+                    hour: h.hour,
+                    requests: Number(h.requests),
+                    avgResponseTime: Math.round(Number(h.avg_response_time))
+                })),
+                rateLimit,
+                timeRange,
+                generatedAt: new Date().toISOString()
+            };
+
+            logger.debug('Detailed API analytics retrieved');
+            return analytics;
+
+        } catch (error) {
+            logger.error('Error getting detailed API analytics:', error);
+            throw new Error('Failed to get detailed API analytics');
+        }
+    }
+
+    /**
+     * Get Logs Data for logs page
+     * Returns system logs and application logs
+     */
+    static async getLogsData(logType = 'application', limit = 100) {
+        try {
+            logger.debug('Getting logs data...', { logType, limit });
+
+            // This is a simplified implementation - in production you'd read from actual log files
+            const logs = [];
+
+            // Generate sample logs for demonstration
+            const logTypes = {
+                application: [
+                    { level: 'info', message: 'Server started successfully', timestamp: new Date() },
+                    { level: 'debug', message: 'Database connection established', timestamp: new Date(Date.now() - 10000) },
+                    { level: 'info', message: 'Analytics data aggregated', timestamp: new Date(Date.now() - 20000) },
+                    { level: 'warn', message: 'High memory usage detected', timestamp: new Date(Date.now() - 30000) },
+                    { level: 'error', message: 'Failed to connect to external service', timestamp: new Date(Date.now() - 40000) }
+                ],
+                error: [
+                    { level: 'error', message: 'Database connection timeout', timestamp: new Date() },
+                    { level: 'error', message: 'Invalid API request format', timestamp: new Date(Date.now() - 15000) },
+                    { level: 'error', message: 'Authentication failed', timestamp: new Date(Date.now() - 25000) }
+                ],
+                access: [
+                    { level: 'info', message: 'GET /api/analytics 200', timestamp: new Date() },
+                    { level: 'info', message: 'POST /api/auth/login 200', timestamp: new Date(Date.now() - 5000) },
+                    { level: 'info', message: 'GET /api/users 401', timestamp: new Date(Date.now() - 10000) }
+                ]
+            };
+
+            const selectedLogs = logTypes[logType] || logTypes.application;
+
+            // Generate more logs if needed
+            while (logs.length < limit && logs.length < 1000) {
+                selectedLogs.forEach(log => {
+                    if (logs.length < limit) {
+                        logs.push({
+                            ...log,
+                            timestamp: new Date(log.timestamp.getTime() - (logs.length * 60000)),
+                            id: `log_${logs.length + 1}`
+                        });
+                    }
+                });
+            }
+
+            const data = {
+                logs: logs.slice(0, limit),
+                totalCount: logs.length,
+                logType,
+                availableTypes: Object.keys(logTypes),
+                generatedAt: new Date().toISOString()
+            };
+
+            logger.debug('Logs data retrieved');
+            return data;
+
+        } catch (error) {
+            logger.error('Error getting logs data:', error);
+            throw new Error('Failed to get logs data');
+        }
+    }
 }

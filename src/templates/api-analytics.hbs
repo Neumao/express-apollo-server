@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #007bff;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --gray: #6c757d;
+            --white: #ffffff;
+            --shadow: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 12px rgba(0,0,0,0.15);
+            --border-radius: 8px;
+            --border-radius-lg: 12px;
+            --font-size-sm: 0.85rem;
+            --font-size-base: 0.95rem;
+            --font-size-lg: 1.1rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .header {
+            background: var(--white);
+            padding: 32px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--info));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, var(--primary), var(--info));
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .stat-card h3 {
+            font-size: var(--font-size-lg);
+            margin-bottom: 12px;
+            color: var(--gray);
+        }
+
+        .stat-value {
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .stat-value.success { color: var(--success); }
+        .stat-value.warning { color: var(--warning); }
+        .stat-value.danger { color: var(--danger); }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .chart-container {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .requests-table {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: var(--gray);
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-200 { background: #d4edda; color: #155724; }
+        .status-400 { background: #f8d7da; color: #721c24; }
+        .status-500 { background: #f8d7da; color: #721c24; }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .pagination-btn {
+            padding: 8px 16px;
+            border: 1px solid #dee2e6;
+            background: var(--white);
+            color: var(--primary);
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .pagination-btn:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .filters {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: var(--gray);
+        }
+
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-chart-bar"></i> {{title}}</h1>
+            <div class="nav-buttons">
+                <a href="/api/analytics" class="nav-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+                <a href="/api/analytics/logs" class="nav-btn">
+                    <i class="fas fa-file-alt"></i> View Logs
+                </a>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label for="timeRange">Time Range:</label>
+                <select id="timeRange" onchange="changeTimeRange(this.value)">
+                    <option value="1h" {{#eq timeRange "1h"}}selected{{/eq}}>Last Hour</option>
+                    <option value="24h" {{#eq timeRange "24h"}}selected{{/eq}}>Last 24 Hours</option>
+                    <option value="7d" {{#eq timeRange "7d"}}selected{{/eq}}>Last 7 Days</option>
+                    <option value="30d" {{#eq timeRange "30d"}}selected{{/eq}}>Last 30 Days</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3><i class="fas fa-chart-line"></i> Total Requests</h3>
+                <div class="stat-value">{{statistics.totalRequests}}</div>
+            </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-clock"></i> Avg Response Time</h3>
+                <div class="stat-value">{{statistics.avgResponseTime}}ms</div>
+            </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-check-circle"></i> Success Rate</h3>
+                <div class="stat-value success">{{statistics.successRate}}%</div>
+            </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-exclamation-triangle"></i> Error Rate</h3>
+                <div class="stat-value danger">{{statistics.errorRate}}%</div>
+            </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-tachometer-alt"></i> Rate Limit</h3>
+                <div class="stat-value {{#if (gt rateLimit.remaining 100)}}success{{else if (gt rateLimit.remaining 50)}}warning{{else}}danger{{/if}}">
+                    {{rateLimit.currentRequests}}/{{rateLimit.limit}}
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <div class="chart-container">
+                <h3>Status Code Distribution</h3>
+                <canvas id="statusChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>HTTP Methods Distribution</h3>
+                <canvas id="methodChart"></canvas>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <div class="chart-container">
+                <h3>Top Endpoints</h3>
+                <canvas id="endpointChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Hourly Request Pattern</h3>
+                <canvas id="hourlyChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Status Code Distribution Chart
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        const statusData = {{{json distributions.statusCodes}}};
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: statusData.map(item => item.code),
+                datasets: [{
+                    data: statusData.map(item => item.count),
+                    backgroundColor: [
+                        '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6c757d'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // HTTP Methods Distribution Chart
+        const methodCtx = document.getElementById('methodChart').getContext('2d');
+        const methodData = {{{json distributions.methods}}};
+        new Chart(methodCtx, {
+            type: 'bar',
+            data: {
+                labels: methodData.map(item => item.method),
+                datasets: [{
+                    label: 'Requests',
+                    data: methodData.map(item => item.count),
+                    backgroundColor: '#007bff'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Top Endpoints Chart
+        const endpointCtx = document.getElementById('endpointChart').getContext('2d');
+        const endpointData = {{{json distributions.topEndpoints}}};
+        new Chart(endpointCtx, {
+            type: 'bar',
+            data: {
+                labels: endpointData.map(item => item.endpoint),
+                datasets: [{
+                    label: 'Requests',
+                    data: endpointData.map(item => item.count),
+                    backgroundColor: '#17a2b8'
+                }]
+            },
+            options: {
+                responsive: true,
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Hourly Pattern Chart
+        const hourlyCtx = document.getElementById('hourlyChart').getContext('2d');
+        const hourlyData = {{{json hourlyData}}};
+        new Chart(hourlyCtx, {
+            type: 'line',
+            data: {
+                labels: hourlyData.map(item => item.hour + ':00'),
+                datasets: [{
+                    label: 'Requests per Hour',
+                    data: hourlyData.map(item => item.requests),
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        function changeTimeRange(timeRange) {
+            const url = new URL(window.location);
+            url.searchParams.set('timeRange', timeRange);
+            url.searchParams.set('page', '1');
+            window.location.href = url.toString();
+        }
+    </script>
+</body>
+</html>

@@ -419,8 +419,12 @@
         }
 
         .refresh-section {
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
             margin-bottom: 24px;
+            flex-wrap: wrap;
         }
 
         .refresh-btn {
@@ -436,6 +440,32 @@
         }
 
         .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, var(--primary), var(--info));
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            margin-left: 12px;
+        }
+
+        .nav-btn.primary {
+            background: linear-gradient(135deg, var(--primary), var(--info));
+        }
+
+        .nav-btn.info {
+            background: linear-gradient(135deg, var(--info), var(--primary));
+        }
+
+        .nav-btn:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-lg);
         }
@@ -507,6 +537,12 @@
         <div class="refresh-section">
             <button class="refresh-btn" onclick="location.reload()">
                 <i class="fas fa-sync-alt"></i> Refresh Dashboard
+            </button>
+            <button class="nav-btn primary" onclick="window.location.href='/api/analytics/api'">
+                <i class="fas fa-chart-bar"></i> API Analytics
+            </button>
+            <button class="nav-btn info" onclick="window.location.href='/api/analytics/logs'">
+                <i class="fas fa-file-alt"></i> Logs
             </button>
         </div>
 

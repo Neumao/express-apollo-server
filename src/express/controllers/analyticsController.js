@@ -103,4 +103,59 @@ export class AnalyticsController {
             next(error);
         }
     }
+
+    /**
+     * Render detailed API analytics page
+     * @route GET /api/analytics/api
+     */
+    static async getApiAnalyticsPage(req, res, next) {
+        try {
+            const { timeRange = '24h', page = 1 } = req.query;
+            const pageNum = parseInt(page);
+
+            // Get detailed API analytics data (no pagination for now)
+            const apiData = await AnalyticsService.getDetailedApiAnalytics(timeRange, pageNum, 1000);
+
+            const templateData = {
+                title: 'API Analytics - Detailed View',
+                timestamp: new Date().toLocaleString(),
+                timeRange,
+                currentPage: pageNum,
+                ...apiData
+            };
+
+            logger.debug('Rendering API analytics page');
+            res.render('api-analytics', templateData);
+        } catch (error) {
+            logger.error('Failed to render API analytics page:', error);
+            next(error);
+        }
+    }
+
+    /**
+     * Render logs page
+     * @route GET /api/analytics/logs
+     */
+    static async getLogsPage(req, res, next) {
+        try {
+            const { logType = 'application', limit = 100 } = req.query;
+
+            // Get logs data
+            const logsData = await AnalyticsService.getLogsData(logType, parseInt(limit));
+
+            const templateData = {
+                title: 'System Logs',
+                timestamp: new Date().toLocaleString(),
+                logType,
+                limit: parseInt(limit),
+                ...logsData
+            };
+
+            logger.debug('Rendering logs page');
+            res.render('logs', templateData);
+        } catch (error) {
+            logger.error('Failed to render logs page:', error);
+            next(error);
+        }
+    }
 }
