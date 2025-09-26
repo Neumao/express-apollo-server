@@ -15,6 +15,9 @@
 - **🏗️ Domain-based Architecture** - Organized by business domains
 - **📧 Email System** - Nodemailer with Handlebars templates
 - **📊 Analytics** - Built-in API metrics and logging
+- **📊 Advanced Monitoring** - Real-time dashboard with performance insights
+- **📋 API Analytics** - Endpoint performance analysis and rate limiting
+- **📝 System Logs** - Comprehensive logging with Winston
 - **🧪 Testing** - Jest testing framework
 - **📝 Comprehensive Logging** - Winston with file rotation
 
@@ -57,6 +60,7 @@ src/
 ### 🔧 Development
 
 - [**Getting Started**](/guides/) - Set up your development environment
+- [**Analytics Guide**](/guides/analytics) - Monitor API performance and metrics
 - [**Authentication Guide**](/guides/authentication) - JWT implementation details
 - [**Testing Guide**](/guides/testing) - Running tests and examples
 
@@ -64,6 +68,7 @@ src/
 
 - [**GraphQL API**](/api/graphql/schema) - Complete GraphQL schema documentation
 - [**REST API**](/api/rest/authentication) - Express.js endpoints
+- [**Analytics API**](/api/rest/analytics) - API monitoring and metrics
 - [**Subscriptions**](/api/graphql/subscriptions) - Real-time features
 
 ### 🏛️ Architecture
@@ -99,13 +104,18 @@ npm run dev
 
 ## 📊 API Endpoints
 
-| Type      | Endpoint         | Description              |
-| --------- | ---------------- | ------------------------ |
-| GraphQL   | `/graphql`       | Main GraphQL endpoint    |
-| WebSocket | `/graphql`       | GraphQL subscriptions    |
-| REST      | `/api/auth/*`    | Authentication endpoints |
-| REST      | `/api/users/*`   | User management          |
-| REST      | `/api/analytics` | API metrics dashboard    |
+| Type      | Endpoint                   | Description                   |
+| --------- | -------------------------- | ----------------------------- |
+| GraphQL   | `/graphql`                 | Main GraphQL endpoint         |
+| WebSocket | `/graphql`                 | GraphQL subscriptions         |
+| REST      | `/api/auth/*`              | Authentication endpoints      |
+| REST      | `/api/users/*`             | User management               |
+| REST      | `/api/analytics`           | Analytics dashboard (HTML)    |
+| REST      | `/api/analytics/api`       | Detailed API analytics (HTML) |
+| REST      | `/api/analytics/logs`      | System logs viewer (HTML)     |
+| REST      | `/api/analytics/metrics`   | System metrics (JSON)         |
+| REST      | `/api/analytics/users`     | User analytics (JSON)         |
+| REST      | `/api/analytics/dashboard` | Dashboard data (JSON)         |
 
 ## 🔐 Authentication Flow
 

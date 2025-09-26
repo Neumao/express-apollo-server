@@ -48,6 +48,7 @@ export default defineConfig({
                     text: 'Guides',
                     items: [
                         { text: 'Getting Started', link: '/guides/' },
+                        { text: 'Analytics & Monitoring', link: '/guides/analytics' },
                         { text: 'Authentication', link: '/guides/authentication' },
                         { text: 'Real-time Subscriptions', link: '/guides/subscriptions' },
                         { text: 'Testing', link: '/guides/testing' },

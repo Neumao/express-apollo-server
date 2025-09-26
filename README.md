@@ -46,13 +46,22 @@
 - Scalable resolver structure
 - Clear separation of concerns
 
-📧 **Email System**
+� **Advanced Analytics & Monitoring**
+
+- Real-time API metrics dashboard with interactive charts
+- Endpoint performance analysis with response time tracking
+- Rate limiting monitoring and usage statistics
+- Comprehensive logging with Winston (application, error, exceptions)
+- API request tracking with detailed metadata
+- Performance insights and optimization recommendations
+
+�📧 **Email System**
 
 - Handlebars templates (welcome, password reset)
 - SMTP configuration with fallback
 - Automated notification workflows
 
-📊 **Production Features**
+�️ **Production Features**
 
 - Winston logging with file rotation
 - Comprehensive error handling
@@ -107,9 +116,12 @@ src/
 ├── ⚙️ config/                  # Configuration & environment
 ├── 🌐 express/                 # REST API layer
 │   ├── 🎮 controllers/         # Route handlers
-│   ├── 🛡️ middleware/          # Auth, logging, errors
+│   │   ├── analytics/         # Analytics controllers
+│   │   └── auth/              # Authentication controllers
+│   ├── 🛡️ middleware/          # Auth, logging, errors, API tracking
 │   ├── 🛣️ routes/              # API endpoints
 │   └── 🔧 services/            # Business logic
+│       └── analyticsService.js # Analytics data processing
 ├── 📡 graphql/                 # GraphQL implementation
 │   ├── 🏗️ resolvers/           # Domain-based resolvers
 │   │   ├── 👤 user/            # User domain (auth, profile)
@@ -118,6 +130,10 @@ src/
 │   └── 🔌 pubsub/              # Real-time subscriptions
 ├── 📧 email/                   # Email templates & service
 ├── 🗄️ prisma/                  # Database schema & client
+├── 📊 templates/               # Handlebars templates
+│   ├── analytics-dashboard.hbs # Main analytics dashboard
+│   ├── api-analytics.hbs       # Detailed API analytics
+│   └── logs.hbs                # System logs viewer
 └── 🛠️ utils/                   # Shared utilities
 ```
 
@@ -261,7 +277,41 @@ const wsClient = createClient({
 - 👤 `userUpdated` - User profile changes (planned)
 - 📢 `notifications` - Real-time notifications (planned)
 
-## 🛠️ Development
+## � Analytics Dashboard
+
+Comprehensive API monitoring and analytics with real-time metrics:
+
+**Dashboard Features:**
+
+- 📈 **Real-time Metrics** - Total requests, response times, success rates
+- 📊 **Interactive Charts** - Status codes, HTTP methods, endpoint performance
+- 🔍 **Detailed Analytics** - Endpoint-by-endpoint performance analysis
+- 📋 **Request Logs** - Recent API requests with full metadata
+- ⚡ **Rate Limiting** - Current usage and limits monitoring
+- 📝 **System Logs** - Application, error, and exception logs
+
+**Access Dashboard:**
+
+```
+🌐 http://localhost:4000/api/analytics          # Main Dashboard
+🌐 http://localhost:4000/api/analytics/api       # Detailed API Analytics
+🌐 http://localhost:4000/api/analytics/logs      # System Logs Viewer
+```
+
+**Analytics Endpoints:**
+
+```bash
+# Get system metrics (JSON)
+GET /api/analytics/metrics
+
+# Get user analytics
+GET /api/analytics/users?timeRange=24h&limit=10
+
+# Get dashboard data
+GET /api/analytics/dashboard
+```
+
+## �🛠️ Development
 
 ### 🧪 Testing
 

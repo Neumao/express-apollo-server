@@ -72,6 +72,7 @@ npm run dev
 ```
 
 Your server will be running at:
+
 - 🌐 REST API: `http://localhost:4000/api`
 - 🎯 GraphQL Playground: `http://localhost:4000/graphql`
 - 🔌 WebSocket: `ws://localhost:4000/graphql`
@@ -150,11 +151,13 @@ curl -X POST http://localhost:4000/api/auth/register \
 ```graphql
 # In Apollo Studio (http://localhost:4000/graphql)
 mutation RegisterUser {
-  register(input: {
-    name: "John Doe"
-    email: "john@example.com"
-    password: "password123"
-  }) {
+  register(
+    input: {
+      name: "John Doe"
+      email: "john@example.com"
+      password: "password123"
+    }
+  ) {
     status
     message
     data {
@@ -174,6 +177,7 @@ mutation RegisterUser {
 
 ## Next Steps
 
+- [Analytics Guide](/guides/analytics) - Monitor API performance and metrics
 - [Authentication Guide](/guides/authentication) - Learn about JWT authentication
 - [GraphQL API](/api/graphql/schema) - Explore the GraphQL schema
 - [Subscriptions Guide](/guides/subscriptions) - Set up real-time features
@@ -184,24 +188,30 @@ mutation RegisterUser {
 ### Common Issues
 
 **Database Connection Error**
+
 ```
 Error: P1001: Can't reach database server
 ```
+
 - Verify PostgreSQL is running
 - Check DATABASE_URL in .env
 - Ensure database exists
 
 **Port Already in Use**
+
 ```
 Error: listen EADDRINUSE :::4000
 ```
+
 - Change PORT in .env file
 - Kill process using port: `lsof -ti:4000 | xargs kill`
 
 **JWT Secret Missing**
+
 ```
 Error: JWT_SECRET is required
 ```
+
 - Set JWT_SECRET in .env file
 - Use a strong, random string
 
