@@ -34,6 +34,9 @@ app.engine('hbs', engine({
         gt: function (a, b) {
             return a > b;
         },
+        lt: function (a, b) {
+            return a < b;
+        },
         subtract: function (a, b) {
             return a - b;
         },

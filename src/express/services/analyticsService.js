@@ -894,6 +894,24 @@ export class AnalyticsService {
                         GROUP BY EXTRACT(HOUR FROM "timestamp")
                         ORDER BY hour
                     `.catch(() => []),
+                    // Endpoint performance metrics
+                    prisma.$queryRaw`
+                        SELECT
+                            SPLIT_PART(endpoint, '?', 1) as endpoint_path,
+                            COUNT(*) as total_requests,
+                            AVG("responseTime") as avg_response_time,
+                            MIN("responseTime") as min_response_time,
+                            MAX("responseTime") as max_response_time,
+                            SUM(CASE WHEN "statusCode" >= 200 AND "statusCode" < 300 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as success_rate,
+                            SUM(CASE WHEN "statusCode" >= 400 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as error_rate
+                        FROM "ApiRequest"
+                        WHERE "timestamp" >= ${startDate}
+                        GROUP BY SPLIT_PART(endpoint, '?', 1)
+                        ORDER BY total_requests DESC
+                    `.catch((error) => {
+                        logger.error('Error in endpoint performance query:', error);
+                        return [];
+                    }),
                     // Rate limiting info (simulated)
                     Promise.resolve({
                         currentRequests: Math.floor(Math.random() * 100) + 50,
@@ -904,7 +922,9 @@ export class AnalyticsService {
                 ])
             ]);
 
-            const [responseStats, statusDistribution, methodDistribution, topEndpoints, hourlyData, rateLimit] = stats;
+            const [responseStats, statusDistribution, methodDistribution, topEndpoints, hourlyData, endpointPerformance, rateLimit] = stats;
+
+            logger.debug('Endpoint performance raw data:', endpointPerformance);
 
             // Calculate additional metrics
             const totalPages = Math.ceil(totalCount / limit);
@@ -955,11 +975,21 @@ export class AnalyticsService {
                     requests: Number(h.requests),
                     avgResponseTime: Math.round(Number(h.avg_response_time))
                 })),
+                endpointPerformance: endpointPerformance.map(ep => ({
+                    endpoint: ep.endpoint_path,
+                    totalRequests: Number(ep.total_requests),
+                    avgResponseTime: Math.round(Number(ep.avg_response_time)),
+                    minResponseTime: Math.round(Number(ep.min_response_time)),
+                    maxResponseTime: Math.round(Number(ep.max_response_time)),
+                    successRate: Math.round(Number(ep.success_rate) * 100) / 100,
+                    errorRate: Math.round(Number(ep.error_rate) * 100) / 100
+                })),
                 rateLimit,
                 timeRange,
                 generatedAt: new Date().toISOString()
             };
 
+            logger.debug('Processed endpoint performance data:', analytics.endpointPerformance);
             logger.debug('Detailed API analytics retrieved');
             return analytics;
 
